@@ -4,7 +4,7 @@ import vars
 import time
 import math
 import random
-from dungeon import generate_dungeon
+from dungeon import generate_dungeon, is_secret_door, reveal_secret_room
 import menus
 from utils import get_line, get_limited_input, format_encounter_line, format_battle_line, format_stats_line, distance
 from vars import console
@@ -37,24 +37,23 @@ def display_dungeon():
                     if projectile_here:
                         row += projectile_here['symbol']
                     else:
+                        # Handle visibility of secret doors and tiles
                         cell = vars.dungeon[y][x]
-                        if cell == vars.graphic["secret_wall_char"] or cell == vars.graphic["wall_char"]:
-                            # Check if within detection distance
-                            if distance(vars.player['pos'], [y, x]) <= vars.player['awareness']:
-                                if cell == vars.graphic["secret_wall_char"]:
-                                    row += vars.graphic["door_char"]  # Reveal secret door
-                                else:
-                                    row += vars.graphic["wall_char"]
+                        if cell == vars.graphic["wall_char"] and within_awareness([y, x]):
+                            if is_secret_door([y, x]):
+                                row += vars.graphic["secret_door_char"]
                             else:
                                 row += vars.graphic["wall_char"]
+                        elif cell == vars.graphic["secret_wall_char"] and within_awareness([y, x]):
+                            row += vars.graphic["wall_char"]
                         else:
-                            # Check if item is on this cell
-                            if (y, x) in vars.items_on_floor:
-                                row += vars.graphic["item_char"]
-                            else:
-                                row += cell
+                            row += cell
         console.print(row, end="")
         print()  # Newline after each row
+
+def within_awareness(tile):
+    """Check if a tile is within the player's awareness range."""
+    return distance(vars.player['pos'], tile) <= vars.player['awareness']
 
 def move_player(direction):
     new_y = vars.player['pos'][0] + vars.directions[direction][0]
@@ -66,9 +65,11 @@ def move_player(direction):
             encounter_enemy(enemy_here)
         elif cell == vars.graphic["wall_char"]:
             console.print(vars.message["notification"]["wall_bump"])
-        elif cell == vars.graphic["secret_wall_char"]:
-            console.print(vars.message["notification"]["wall_bump"])
-        elif cell in [vars.graphic["floor_char"], vars.graphic["door_char"], vars.graphic["secret_floor_char"], vars.graphic["item_char"], vars.graphic["treasure_char"], vars.graphic["exit_char"], vars.graphic["shop_char"]]:
+        elif cell == vars.graphic["secret_door_char"]:
+            console.print(vars.message["notification"]["secret_door_bump"])
+            vars.dungeon[new_y][new_x] = vars.graphic["floor_char"]  # Replace door with normal floor
+            reveal_secret_room([new_y, new_x])  # Reveal the connected room and hallway
+        elif cell in [vars.graphic["floor_char"], vars.graphic["item_char"], vars.graphic["treasure_char"], vars.graphic["exit_char"], vars.graphic["shop_char"]]:
             if (new_y, new_x) in vars.items_on_floor:
                 find_item(new_y, new_x)
                 del vars.items_on_floor[(new_y, new_x)]
@@ -430,24 +431,41 @@ def check_level_up():
         return remaining_exp 
 
 def equip_item(item):
-    if item['type'] == 'weapon':
-        vars.player['equipped']['weapon'] = item
-        console.print(f"You equipped {item['name']}.")
-    elif item['type'] == 'armor':
-        vars.player['equipped']['armor'] = item
-        console.print(f"You equipped {item['name']}.")
-    elif item['type'] == 'accessory':
-        # Remove effect of current accessory if any
-        if vars.player['equipped']['accessory']:
-            remove_accessory_effect(vars.player['equipped']['accessory'])
-        vars.player['equipped']['accessory'] = item
-        apply_accessory_effect(item)
-        console.print(f"You equipped {item['name']}.")
-    else:
-        console.print("You cannot equip this item.")
-    # Update player class based on new equipment
-    menus.determine_player_class()
-    time.sleep(vars.settings["delay_equip_item"])
+    """Equip an item (weapon, armor, or accessory). The old item is re-added to the inventory."""
+    # Check if the item is equipable
+    if item['type'] not in ['weapon', 'armor', 'accessory']:
+        console.print(f"{item['name']} cannot be equipped.")
+        return
+
+    # Determine the slot (weapon, armor, or accessory)
+    slot = item['type']
+
+    # Unequip the currently equipped item in the slot, if any
+    if vars.player['equipped'][slot]:
+        old_item = vars.player['equipped'][slot]
+        vars.player['inventory'].append(old_item)  # Add the old item back to the inventory
+        console.print(f"Unequipped {old_item['name']} and returned it to your inventory.")
+
+    # Equip the new item
+    vars.player['equipped'][slot] = item
+    vars.player['inventory'].remove(item)  # Remove the new item from the inventory
+    console.print(f"Equipped {item['name']}.")
+
+    # Optional: Update player stats if the item has specific effects
+    update_player_stats()
+
+def update_player_stats():
+    """Update the player's stats based on equipped items."""
+    weapon = vars.player['equipped']['weapon']
+    armor = vars.player['equipped']['armor']
+    accessory = vars.player['equipped']['accessory']
+
+    vars.player['attack'] = vars.player['base_attack'] + (weapon['attack'] if weapon else 0)
+    vars.player['defense'] = vars.player['base_defense'] + (armor['defense'] if armor else 0)
+    vars.player['agility'] = vars.player['base_agility'] + (accessory['agility'] if accessory else 0)
+
+    console.print(f"Updated player stats: Attack={vars.player['attack']}, Defense={vars.player['defense']}, Agility={vars.player['agility']}")
+
 
 def apply_accessory_effect(item):
     effect = item.get('effect')

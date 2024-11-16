@@ -10,7 +10,7 @@
     "defense": 5,
     "agility": 5,
     "wisdom": 5,
-    "awareness": 1,
+    "awareness": 10,
     "inventory": [],
     "equipped": {
         "weapon": null,

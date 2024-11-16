@@ -5,6 +5,89 @@ import random
 import vars
 from utils import get_line
 
+class BSPNode:
+    def __init__(self, x, y, width, height):
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.left = None
+        self.right = None
+        self.room = None
+
+    def split(self, min_size):
+        """Split the node into two children."""
+        if self.left or self.right:
+            return False  # Already split
+
+        split_horizontally = random.choice([True, False])
+        max_split = (self.height if split_horizontally else self.width) - min_size
+
+        if max_split <= min_size:
+            return False
+
+        split = random.randint(min_size, max_split)
+
+        if split_horizontally:
+            self.left = BSPNode(self.x, self.y, self.width, split)
+            self.right = BSPNode(self.x, self.y + split, self.width, self.height - split)
+        else:
+            self.left = BSPNode(self.x, self.y, split, self.height)
+            self.right = BSPNode(self.x + split, self.y, self.width - split, self.height)
+
+        return True
+
+    def create_room(self, padding=vars.settings["padding"]):
+        """
+        Create a room within this node's boundaries.
+        Padding defines the minimum distance between the room and the edges of the BSP cell.
+        """
+        # Ensure there's enough space for padding on all sides
+        if self.width <= 2 * padding or self.height <= 2 * padding:
+            print(f"Skipping room creation due to insufficient size: width={self.width}, height={self.height}")
+            return None
+
+        # Define room size within the available space
+        room_width = random.randint(4, self.width - 2 * padding)
+        room_height = random.randint(4, self.height - 2 * padding)
+
+        # Define room position within the padded area
+        room_x = random.randint(self.x + padding, self.x + self.width - room_width - padding)
+        room_y = random.randint(self.y + padding, self.y + self.height - room_height - padding)
+
+        # Decide if this room should be a secret room
+        is_secret_room = random.random() < vars.settings["secret_room_chance"]
+        
+        room = {
+            'x': room_x,
+            'y': room_y,
+            'width': room_width,
+            'height': room_height,
+            'is_secret': is_secret_room
+        }
+
+        # If it's a secret room, add it to the secret_rooms list
+        if is_secret_room:
+            vars.secret_rooms.append(room)
+        else:
+            vars.rooms.append(room)
+
+        # Store the room in the node
+        self.room = room
+        return room
+
+def get_all_leaves(node):
+    """Retrieve all leaf nodes from a BSP tree."""
+    if not node.left and not node.right:
+        return [node]
+    leaves = []
+    if node.left:
+        leaves.extend(get_all_leaves(node.left))
+    if node.right:
+        leaves.extend(get_all_leaves(node.right))
+    return leaves
+
+
 # Dungeon Generation Functions
 def generate_dungeon(player):
     vars.dungeon = [[vars.graphic["wall_char"] for _ in range(vars.settings["dungeon_width"])] for _ in range(vars.settings["dungeon_height"])]
@@ -19,12 +102,12 @@ def generate_dungeon(player):
 
     # Place player in the first room
     first_room = vars.rooms[0]
-    player['pos'] = [first_room['y'] + first_room['settings["dungeon_height"]'] // 2, first_room['x'] + first_room['settings["dungeon_width"]'] // 2]
+    player['pos'] = [first_room['y'] + first_room['height'] // 2, first_room['x'] + first_room['width'] // 2]
 
     # Place exit in the last room
     last_room = vars.rooms[-1]
-    exit_x = last_room['x'] + last_room['settings["dungeon_height"]'] // 2
-    exit_y = last_room['y'] + last_room['settings["dungeon_width"]'] // 2
+    exit_x = last_room['x'] + last_room['width'] // 2
+    exit_y = last_room['y'] + last_room['height'] // 2
     vars.dungeon[exit_y][exit_x] = vars.graphic["exit_char"]
 
     # Adjust item and enemy counts based on floor
@@ -51,38 +134,47 @@ def generate_dungeon(player):
         create_secret_rooms()
         
 def make_map():
-    global dungeon, rooms, secret_rooms
-    # Initialize map with walls
-    for y in range(vars.settings["dungeon_height"]):
-        for x in range(vars.settings["dungeon_width"]):
-            vars.dungeon[y][x] = vars.graphic["wall_char"]
+    root = BSPNode(0, 0, vars.settings["dungeon_width"], vars.settings["dungeon_height"])
+    nodes = [root]
+    min_size = 8
 
-    # Define the number of rooms
-    max_rooms = 20  # Adjusted number of rooms
-    min_size = 4
-    max_size = 10
+    # Split the nodes until they are small enough
+    while nodes:
+        node = nodes.pop(0)
+        if node.split(min_size):
+            nodes.append(node.left)
+            nodes.append(node.right)
 
-    for _ in range(max_rooms):
-        w = random.randint(min_size, max_size)
-        h = random.randint(min_size, max_size)
-        x = random.randint(1, vars.settings["dungeon_width"] - w - 2)
-        y = random.randint(1, vars.settings["dungeon_height"] - h - 2)
+    # Generate rooms in leaf nodes
+    rooms = []
+    leaf_nodes = [node for node in get_all_leaves(root)]
+    print(f"Number of leaf nodes: {len(leaf_nodes)}")  # Debug print
 
-        new_room = {'x': x, 'y': y, 'settings["dungeon_width"]': w, 'settings["dungeon_height"]': h}
+    for node in leaf_nodes:
+        room = node.create_room()
+        if room:
+            if not all(k in room for k in ['x', 'y', 'width', 'height']):
+                print(f"Malformed room: {room}")  # Debug output
+                continue
+            rooms.append(room)
+            create_room(room)
 
-        # Check for overlap
-        if any(rooms_overlap(new_room, other_room) for other_room in vars.rooms + vars.secret_rooms):
-            continue
+    # Fallback if no rooms
+    if not rooms:
+        print("No rooms were created! Creating fallback room.")
+        fallback_room = {'x': 5, 'y': 5, 'width': 10, 'height': 10}
+        rooms.append(fallback_room)
+        create_room(fallback_room)
 
-        create_room(new_room)
-        if vars.rooms:
-            # Connect the new room to the previous room
-            prev_room = vars.rooms[-1]
-            connect_rooms(prev_room, new_room)
+    # Connect the rooms
+    for i in range(1, len(rooms)):
+        connect_rooms(rooms[i - 1], rooms[i])
 
-        vars.rooms.append(new_room)
+    vars.rooms = rooms
+    print(f"Number of rooms created: {len(vars.rooms)}")  # Debug print
 
 def create_secret_rooms():
+    """Create secret rooms and connect them to the main dungeon."""
     num_secret_rooms = random.randint(1, 3)
     for _ in range(num_secret_rooms):
         attempts = 0
@@ -92,7 +184,12 @@ def create_secret_rooms():
             x = random.randint(1, vars.settings["dungeon_width"] - w - 2)
             y = random.randint(1, vars.settings["dungeon_height"] - h - 2)
 
-            secret_room = {'x': x, 'y': y, 'settings["dungeon_width"]': w, 'settings["dungeon_height"]': h}
+            secret_room = {'x': x, 'y': y, 'width': w, 'height': h}
+
+            # Debugging output
+            print("Checking overlap with rooms:")
+            print("Current secret room:", secret_room)
+            print("Existing rooms and secret rooms:", vars.rooms + vars.secret_rooms)
 
             # Check for overlap
             if any(rooms_overlap(secret_room, other_room) for other_room in vars.rooms + vars.secret_rooms):
@@ -100,11 +197,12 @@ def create_secret_rooms():
                 continue
 
             create_secret_room(secret_room)
+
             # Connect the secret room to a random room via a secret door
             target_room = random.choice(vars.rooms)
             connect_secret_room(secret_room, target_room)
 
-            # Place stronger enemy and loot in secret room
+            # Place stronger enemy and loot in the secret room
             place_strong_enemy(secret_room)
             place_secret_room_items(secret_room)
 
@@ -112,44 +210,58 @@ def create_secret_rooms():
             break
 
 def create_secret_room(room):
-    for x in range(room['x'], room['x'] + room['settings["dungeon_width"]']):
-        for y in range(room['y'], room['y'] + room['settings["dungeon_height"]']):
-            vars.dungeon[y][x] = vars.graphic["secret_floor_char"]
+    """Carve out the secret room with solid walls until revealed."""
+    for x in range(room['x'], room['x'] + room['width']):
+        for y in range(room['y'], room['y'] + room['height']):
+            vars.dungeon[y][x] = vars.graphic["wall_char"]  # Render as wall initially
 
 def connect_secret_room(secret_room, target_room):
-    # Create a secret corridor
-    x1, y1 = secret_room['x'] + secret_room['settings["dungeon_width"]'] // 2, secret_room['y'] + secret_room['settings["dungeon_height"]'] // 2
-    x2, y2 = target_room['x'] + target_room['settings["dungeon_width"]'] // 2, target_room['y'] + target_room['settings["dungeon_height"]'] // 2
+    """Connect a secret room to a normal room via a secret door."""
+    x1, y1 = secret_room['x'] + secret_room['width'] // 2, secret_room['y'] + secret_room['height'] // 2
+    x2, y2 = target_room['x'] + target_room['width'] // 2, target_room['y'] + target_room['height'] // 2
 
-    path = get_line(x1, y1, x2, y2)
-    for x, y in path:
-        if vars.dungeon[y][x] == vars.graphic["wall_char"]:
-            vars.dungeon[y][x] = vars.graphic["secret_wall_char"]  # Secret walls
+    # Generate an L-shaped path
+    if random.choice([True, False]):
+        create_h_tunnel(x1, x2, y1)
+        create_v_tunnel(y1, y2, x2)
+    else:
+        create_v_tunnel(y1, y2, x1)
+        create_h_tunnel(x1, x2, y2)
+
+    # Place a secret door
+    vars.dungeon[y2][x2] = vars.graphic["secret_door_char"]
             
 def place_strong_enemy(room):
+    """Place a strong enemy in the given room."""
     from enemy import Enemy
-    
-    x = room['x'] + room['settings["dungeon_width"]'] // 2
-    y = room['y'] + room['settings["dungeon_height"]'] // 2
-    # Select a strong enemy based on floor level
+
+    # Calculate the position at the center of the room
+    x = room['x'] + room['width'] // 2
+    y = room['y'] + room['height'] // 2
+
+    # Select a strong enemy based on the floor level
     enemy_type = select_strong_enemy_type()
     enemy = Enemy(enemy_type, y, x)
     vars.enemies.append(enemy)
 
 def select_strong_enemy_type():
+    """Select a strong enemy type based on the floor level."""
     floor = vars.player['floor']
     suitable_enemies = [et for et in vars.enemy_types_list if et['base_health'] >= 15 + floor * 2]
     if not suitable_enemies:
-        suitable_enemies = vars.enemy_types_list
+        suitable_enemies = vars.enemy_types_list  # Default to all enemies if no suitable ones are found
     return random.choice(suitable_enemies)
 
 def place_secret_room_items(room):
+    """Place items in a secret room."""
     num_items = random.randint(1, 2)
     for _ in range(num_items):
         attempts = 0
         while attempts < 100:
-            x = random.randint(room['x'] + 1, room['x'] + room['settings["dungeon_width"]'] - 2)
-            y = random.randint(room['y'] + 1, room['y'] + room['settings["dungeon_height"]'] - 2)
+            x = random.randint(room['x'] + 1, room['x'] + room['width'] - 2)
+            y = random.randint(room['y'] + 1, room['y'] + room['height'] - 2)
+
+            # Ensure placement on a secret floor tile
             if vars.dungeon[y][x] == vars.graphic["secret_floor_char"]:
                 vars.dungeon[y][x] = vars.graphic["item_char"]
                 item = random.choice([item for item in vars.items if item['type'] in ['weapon', 'armor', 'accessory']])
@@ -158,36 +270,55 @@ def place_secret_room_items(room):
             attempts += 1
 
 def rooms_overlap(room1, room2):
-    return (room1['x'] <= room2['x'] + room2['settings["dungeon_width"]'] and
-            room1['x'] + room1['settings["dungeon_width"]'] >= room2['x'] and
-            room1['y'] <= room2['y'] + room2['settings["dungeon_height"]'] and
-            room1['y'] + room1['settings["dungeon_height"]'] >= room2['y'])
+    """Check if two rooms overlap."""
+    required_keys = ['x', 'y', 'width', 'height']
+    for key in required_keys:
+        if key not in room1 or key not in room2:
+            print(f"Malformed room: room1={room1}, room2={room2}")  # Debug print
+            return False
+
+    return (room1['x'] <= room2['x'] + room2['width'] - 1 and
+            room1['x'] + room1['width'] - 1 >= room2['x'] and
+            room1['y'] <= room2['y'] + room2['height'] - 1 and
+            room1['y'] + room1['height'] - 1 >= room2['y'])
 
 def create_room(room):
-    for x in range(room['x'], room['x'] + room['settings["dungeon_width"]']):
-        for y in range(room['y'], room['y'] + room['settings["dungeon_height"]']):
-            vars.dungeon[y][x] = vars.graphic["floor_char"]
+    """Carve out a room in the dungeon."""
+    for x in range(room['x'], room['x'] + room['width']):
+        for y in range(room['y'], room['y'] + room['height']):
+            if room.get('is_secret'):
+                vars.dungeon[y][x] = vars.graphic["wall_char"]  # Render secret rooms as walls initially
+            else:
+                vars.dungeon[y][x] = vars.graphic["floor_char"]
 
 def connect_rooms(room1, room2):
-    x1, y1 = room1['x'] + room1['settings["dungeon_height"]'] // 2, room1['y'] + room1['settings["dungeon_height"]'] // 2
-    x2, y2 = room2['x'] + room2['settings["dungeon_height"]'] // 2, room2['y'] + room2['settings["dungeon_height"]'] // 2
+    """Connect two rooms with straight horizontal and vertical corridors."""
+    x1, y1 = room1['x'] + room1['width'] // 2, room1['y'] + room1['height'] // 2
+    x2, y2 = room2['x'] + room2['width'] // 2, room2['y'] + room2['height'] // 2
 
+    # Create an L-shaped connection: horizontal then vertical or vertical then horizontal
     if random.choice([True, False]):
+        # Horizontal first
         create_h_tunnel(x1, x2, y1)
         create_v_tunnel(y1, y2, x2)
     else:
+        # Vertical first
         create_v_tunnel(y1, y2, x1)
         create_h_tunnel(x1, x2, y2)
 
+    # Place a secret door if one of the rooms is secret
+    if room1.get('is_secret') or room2.get('is_secret'):
+        vars.dungeon[y2][x2] = vars.graphic["secret_door_char"]
+
 def create_h_tunnel(x1, x2, y):
+    """Create a horizontal tunnel."""
     for x in range(min(x1, x2), max(x1, x2) + 1):
-        if vars.dungeon[y][x] == vars.graphic["wall_char"]:
-            vars.dungeon[y][x] = vars.graphic["floor_char"]
+        vars.dungeon[y][x] = vars.graphic["floor_char"]  # Use floor_char for normal hallways
 
 def create_v_tunnel(y1, y2, x):
+    """Create a vertical tunnel."""
     for y in range(min(y1, y2), max(y1, y2) + 1):
-        if vars.dungeon[y][x] == vars.graphic["wall_char"]:
-            vars.dungeon[y][x] = vars.graphic["floor_char"]
+        vars.dungeon[y][x] = vars.graphic["floor_char"]  # Use floor_char for normal hallways
 
 def place_random_items(symbol, count, rare=False):
     for _ in range(count):
@@ -249,3 +380,40 @@ def place_shop():
             vars.dungeon[y][x] = vars.graphic["shop_char"]
             break
         attempts += 1
+        
+def is_secret_door(tile):
+    """Determine if a tile is part of a secret door."""
+    for room in vars.secret_rooms:
+        if room_contains_tile(room, tile):
+            return True
+    return False
+
+def reveal_secret_room(secret_door_pos):
+    """Reveal the secret room and its connected hallway."""
+    for room in vars.secret_rooms:
+        if room_contains_tile(room, secret_door_pos):
+            # Reveal the room tiles
+            for x in range(room['x'], room['x'] + room['settings["dungeon_width"]']):
+                for y in range(room['y'], room['y'] + room['settings["dungeon_height"]']):
+                    vars.dungeon[y][x] = vars.graphic["floor_char"]
+                    # Reveal items
+                    if (y, x) in vars.items_on_floor:
+                        vars.dungeon[y][x] = vars.graphic["item_char"]
+                    # Reveal enemies
+                    for enemy in vars.enemies:
+                        if enemy.pos == [y, x]:
+                            vars.dungeon[y][x] = enemy.symbol
+            break
+
+def connect_to_hallway(secret_door_pos, room):
+    """Reveals the hallway connecting the door to the center of the secret room."""
+    path = get_line(secret_door_pos[1], secret_door_pos[0],
+                    room['x'] + room['settings["dungeon_width"]'] // 2,
+                    room['y'] + room['settings["dungeon_height"]'] // 2)
+    for x, y in path:
+        vars.dungeon[y][x] = vars.graphic["floor_char"]
+
+def room_contains_tile(room, tile):
+    """Check if a tile is within the bounds of a room."""
+    return room['x'] <= tile[1] < room['x'] + room['width'] and \
+           room['y'] <= tile[0] < room['y'] + room['height']

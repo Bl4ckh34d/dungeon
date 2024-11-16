@@ -1,9 +1,9 @@
 {
     "dungeon_height": 20,
     "dungeon_width": 70,
+    "padding": 1,
+    "secret_room_chance": 0.2,
     "min_rows": 17,
-    "delay_wall_bump": 0.5,
-    "delay_wall_bump_secret": 0.5,
     "delay_next_floor": 1,
     "delay_flee_success": 0.5,
     "delay_invalid_action": 0.1,

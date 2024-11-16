@@ -131,6 +131,7 @@
         "type_any_key": "==========================| [bold cyan]Return[/bold cyan]: Cancel |==========================",
         "which_to_delete": "==================| [bold cyan]#[/bold cyan]: [bold cyan]Delete[/bold cyan] File · [bold cyan]Return[/bold cyan]: Cancel |=================",
         "wall_bump": " You bump into a wall.",
+        "secret_door_bump": " You bump into a wall.",
         "cannot_use_item": " You cannot use this item.",
         "sold_item": " You sold {item} for [bold yellow]{price} gold[/bold yellow]!",
         "game_finished": "\n  ✧･ﾟ: *✧･ ░▒▓█ [bold green]Congratulations! You have found you way out![/bold green] █▓▒░ ･✧*:･ﾟ✧\n",
