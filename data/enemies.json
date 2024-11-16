@@ -1,0 +1,14 @@
+[
+    {"key": "g", "name": "Gnome", "base_health": 10, "base_attack": 4, "base_defense": 2, "symbol": "[red]g[/red]", "ranged": false, "loot": "none", "weaknesses": ["shock"]},
+    {"key": "o", "name": "Orc", "base_health": 15, "base_attack": 6, "base_defense": 3, "symbol": "[red]o[/red]", "ranged": true, "loot": "weapon", "shooting_cooldown": 2},
+    {"key": "t", "name": "Troll", "base_health": 35, "base_attack": 10, "base_defense": 8, "symbol": "[red]T[/red]", "ranged": false, "loot": "none", "movement_cooldown": 1, "weaknesses": ["burn"]},
+    {"key": "d", "name": "Dragon", "base_health": 50, "base_attack": 15, "base_defense": 10, "symbol": "[red]D[/red]", "ranged": true, "loot": "treasure", "movement_cooldown": 2, "immunities": ["burn"], "weaknesses": ["ice"], "continuous_attack": true},
+    {"key": "s", "name": "Skeleton", "base_health": 12, "base_attack": 5, "base_defense": 2, "symbol": "[red]S[/red]", "ranged": false, "loot": "weapon", "immunities": ["poison"], "weaknesses": ["shock"]},
+    {"key": "m", "name": "Mage", "base_health": 18, "base_attack": 7, "base_defense": 3, "symbol": "[red]M[/red]", "ranged": true, "loot": "magical", "movement_cooldown": 1, "weaknesses": ["silence"], "continuous_attack": true},
+    {"key": "c", "name": "Cave Bat", "base_health": 5, "base_attack": 2, "base_defense": 1, "symbol": "[red]b[/red]", "ranged": false, "loot": "none"},
+    {"key": "r", "name": "Rat", "base_health": 6, "base_attack": 2, "base_defense": 1, "symbol": "[red]r[/red]", "ranged": false, "loot": "none", "weaknesses": ["burn"]},
+    {"key": "b", "name": "Goblin", "base_health": 8, "base_attack": 3, "base_defense": 2, "symbol": "[red]G[/red]", "ranged": false, "loot": "weapon"},
+    {"key": "k", "name": "Kobold", "base_health": 7, "base_attack": 3, "base_defense": 1, "symbol": "[red]k[/red]", "ranged": false, "loot": "weapon"},
+    {"key": "f", "name": "Ferret", "base_health": 4, "base_attack": 1, "base_defense": 0, "symbol": "[red]f[/red]", "ranged": false, "loot": "none", "weaknesses": ["burn"]},
+    {"key": "z", "name": "Zombie", "base_health": 14, "base_attack": 5, "base_defense": 2, "symbol": "[red]Z[/red]", "ranged": false, "loot": "none", "movement_cooldown": 2, "immunities": ["poison", "curse"], "weaknesses": ["burn"]}
+]

@@ -1,0 +1,11 @@
+{
+    "wall_char": "[#333333]█[/#333333]",
+    "floor_char": "[#000000] [/#000000]",
+    "secret_wall_char": "[#333333]█[/#333333]",
+    "secret_floor_char": "[#222222]█[/#222222]",
+    "door_char": "[#555555]▒[/#555555]",
+    "exit_char": "[bold blue]^[/bold blue]",
+    "shop_char": "[magenta]S[/magenta]",
+    "treasure_char": "[gold1]*[/gold1]",
+    "item_char": "[cyan]°[/cyan]"
+}

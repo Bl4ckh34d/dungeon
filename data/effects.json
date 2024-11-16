@@ -1,0 +1,23 @@
+{
+    "effect_damage": {
+        "POISON_DAMAGE" : 1,
+        "BURN_DAMAGE" : 2,
+        "SHOCK_DAMAGE" : 3,
+        "FIREBALL_DAMAGE" : 15,
+        "ICE_SHARD_DAMAGE" : 10,
+        "LIGHTNING_DAMAGE" : 12
+    },
+    "effect": [
+        { "effect": "[bold green]poison[/bold green]", "duration": 5 },
+        { "effect": "[bold red]burn[/bold red]", "duration": 3 },
+        { "effect": "[bold #90D5FF]freeze[/bold #90D5FF]", "duration": 2 },
+        { "effect": "[bold blue]shock[/bold blue]", "duration": 1 },
+        { "effect": "[bold #f2d2fe]invisibility[/bold #f2d2fe]", "duration": 5 },
+        { "effect": "[bold #4a412f]blindness[/bold #4a412f]", "duration": 5 },
+        { "effect": "poison_resist", "duration": 10 },
+        { "effect": "fire_resist", "duration": 10 },
+        { "effect": "ice_resist", "duration": 10 },
+        { "effect": "shock_resist", "duration": 10 },
+        { "effect": "blind_resist", "duration": 10 }
+    ]
+}

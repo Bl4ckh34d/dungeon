@@ -1,0 +1,549 @@
+[
+    {
+        "name": "Iron Sword",
+        "type": "weapon",
+        "attack": 3,
+        "value": 20,
+        "flavor_text_identified": "A sturdy iron sword, reliable in battle.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Steel Axe",
+        "type": "weapon",
+        "attack": 5,
+        "value": 35,
+        "flavor_text_identified": "A heavy steel axe, perfect for cleaving through armor.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Fire Wand",
+        "type": "weapon",
+        "attack": 4,
+        "effect": "burn",
+        "value": 50,
+        "range": true,
+        "flavor_text_identified": "A wand imbued with the essence of fire, unleashing flames upon foes.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Ice Staff",
+        "type": "weapon",
+        "attack": 4,
+        "effect": "freeze",
+        "value": 50,
+        "range": true,
+        "flavor_text_identified": "A staff chilled with the power of ice, capable of freezing enemies in their tracks.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Poison Dagger",
+        "type": "weapon",
+        "attack": 3,
+        "effect": "poison",
+        "value": 45,
+        "flavor_text_identified": "A dagger coated with deadly poison, ensuring enemies suffer long after the strike.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Lightning Rod",
+        "type": "weapon",
+        "attack": 5,
+        "effect": "shock",
+        "value": 55,
+        "range": true,
+        "flavor_text_identified": "A rod that channels lightning, striking foes from afar with electric fury.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Bow",
+        "type": "weapon",
+        "attack": 4,
+        "value": 40,
+        "range": true,
+        "flavor_text_identified": "A finely crafted bow, perfect for ranged attacks.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Crossbow",
+        "type": "weapon",
+        "attack": 6,
+        "value": 60,
+        "range": true,
+        "flavor_text_identified": "A crossbow with enhanced power, delivering bolts with deadly precision.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Magic Staff",
+        "type": "weapon",
+        "attack": 5,
+        "effect": "magic",
+        "value": 70,
+        "range": true,
+        "flavor_text_identified": "A staff pulsing with magical energy, augmenting the wielder's spells.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Mithril Sword",
+        "type": "weapon",
+        "attack": 7,
+        "value": 60,
+        "flavor_text_identified": "A lightweight mithril sword, combining strength with agility.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Obsidian Blade",
+        "type": "weapon",
+        "attack": 8,
+        "effect": "bleed",
+        "value": 75,
+        "flavor_text_identified": "A blade forged from obsidian, causing deep wounds that bleed profusely.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Enchanted Bow",
+        "type": "weapon",
+        "attack": 6,
+        "effect": "shock",
+        "value": 65,
+        "range": true,
+        "flavor_text_identified": "An enchanted bow that electrifies arrows, shocking enemies upon impact.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Shadow Dagger",
+        "type": "weapon",
+        "attack": 5,
+        "effect": "curse",
+        "value": 80,
+        "flavor_text_identified": "A dagger enveloped in shadows, cursing those it strikes.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Sun Sword",
+        "type": "weapon",
+        "attack": 9,
+        "effect": "burn",
+        "value": 100,
+        "flavor_text_identified": "A radiant sun sword, blazing with the power of the sun.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Storm Hammer",
+        "type": "weapon",
+        "attack": 10,
+        "effect": "shock",
+        "value": 110,
+        "flavor_text_identified": "A hammer crackling with storm energy, delivering electrifying blows.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Frost Bow",
+        "type": "weapon",
+        "attack": 7,
+        "effect": "freeze",
+        "value": 90,
+        "range": true,
+        "flavor_text_identified": "A bow imbued with frost, freezing arrows mid-flight to immobilize targets.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Venom Blade",
+        "type": "weapon",
+        "attack": 6,
+        "effect": "poison",
+        "value": 85,
+        "flavor_text_identified": "A blade dripping with venom, poisoning enemies with each strike.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Dragon Slayer",
+        "type": "weapon",
+        "attack": 12,
+        "value": 150,
+        "flavor_text_identified": "A legendary sword forged to slay dragons, pulsating with ancient power.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Staff of Healing",
+        "type": "weapon",
+        "attack": 2,
+        "effect": "heal",
+        "value": 75,
+        "flavor_text_identified": "A staff that radiates healing energy, restoring vitality to the bearer.",
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Leather Armor",
+        "type": "armor",
+        "defense": 2,
+        "value": 25,
+        "flavor_text_identified": "Lightweight leather armor, offering basic protection without hindering movement.",
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Chainmail",
+        "type": "armor",
+        "defense": 4,
+        "value": 45,
+        "flavor_text_identified": "Interlocking chainmail, providing robust defense against physical attacks.",
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Dragon Scale",
+        "type": "armor",
+        "defense": 6,
+        "value": 70,
+        "flavor_text_identified": "Armor crafted from dragon scales, offering exceptional protection and resilience.",
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Platinum Shield",
+        "type": "armor",
+        "defense": 5,
+        "value": 50,
+        "flavor_text_identified": "A shiny platinum shield, reflecting attacks and providing solid defense.",
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Helmet of Insight",
+        "type": "armor",
+        "defense": 2,
+        "value": 30,
+        "flavor_text_identified": "A helmet that grants enhanced perception and awareness to its wearer.",
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Boots of Speed",
+        "type": "armor",
+        "defense": 1,
+        "value": 25,
+        "flavor_text_identified": "Boots that increase the wearer's speed, allowing for swift maneuvers.",
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Gauntlets of Strength",
+        "type": "armor",
+        "defense": 1,
+        "attack": 1,
+        "value": 35,
+        "flavor_text_identified": "Gauntlets that enhance the wearer's strength, enabling powerful strikes.",
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Cloak of Shrouding",
+        "type": "armor",
+        "defense": 3,
+        "effect": "invisibility",
+        "value": 90,
+        "flavor_text_identified": "A cloak that renders the wearer invisible, perfect for stealth operations.",
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Reflective Shield",
+        "type": "armor",
+        "defense": 4,
+        "effect": "reflect",
+        "value": 80,
+        "flavor_text_identified": "A shield capable of reflecting magical attacks back to their source.",
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Armor of Healing",
+        "type": "armor",
+        "defense": 5,
+        "effect": "regenerate",
+        "value": 500,
+        "flavor_text_identified": "Armor that slowly regenerates the wearer's health over time.",
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Health Potion",
+        "type": "potion",
+        "heal": 20,
+        "value": 20,
+        "flavor_text": "A red potion that restores health when consumed."
+    },
+    {
+        "name": "Mana Potion",
+        "type": "potion",
+        "mana": 20,
+        "value": 20,
+        "flavor_text": "A blue potion that replenishes mana for casting spells."
+    },
+    {
+        "name": "Elixir of Life",
+        "type": "potion",
+        "heal": 50,
+        "value": 70,
+        "flavor_text": "A rare elixir that significantly restores health."
+    },
+    {
+        "name": "Potion of Shrouding",
+        "type": "potion",
+        "effect": "invisibility",
+        "value": 50,
+        "flavor_text": "A potion that grants temporary invisibility to the drinker."
+    },
+    {
+        "name": "Antidote",
+        "type": "potion",
+        "effect": "cure_poison",
+        "value": 15,
+        "flavor_text": "A potion that cures poisoning effects."
+    },
+    {
+        "name": "Burn Salve",
+        "type": "potion",
+        "effect": "cure_burn",
+        "value": 15,
+        "flavor_text": "A salve that soothes burn injuries."
+    },
+    {
+        "name": "Potion of Strength",
+        "type": "potion",
+        "effect": "strength",
+        "value": 40,
+        "flavor_text": "A potion that temporarily increases your strength."
+    },
+    {
+        "name": "Potion of Defense",
+        "type": "potion",
+        "effect": "defense",
+        "value": 40,
+        "flavor_text": "A potion that temporarily boosts your defense."
+    },
+    {
+        "name": "Potion of Speed",
+        "type": "potion",
+        "effect": "speed",
+        "value": 40,
+        "flavor_text": "A potion that temporarily enhances your agility."
+    },
+    {
+        "name": "Potion of Wisdom",
+        "type": "potion",
+        "effect": "wisdom",
+        "value": 40,
+        "flavor_text": "A potion that temporarily increases your wisdom."
+    },
+    {
+        "name": "Scroll of Fireball",
+        "type": "scroll",
+        "effect": "fireball",
+        "value": 30,
+        "flavor_text": "A scroll that allows the casting of a powerful fireball spell."
+    },
+    {
+        "name": "Scroll of Ice Shard",
+        "type": "scroll",
+        "effect": "ice_shard",
+        "value": 30,
+        "flavor_text": "A scroll that enables the casting of an ice shard spell."
+    },
+    {
+        "name": "Scroll of Lightning",
+        "type": "scroll",
+        "effect": "lightning",
+        "value": 35,
+        "flavor_text": "A scroll that grants the ability to cast a lightning spell."
+    },
+    {
+        "name": "Scroll of Healing",
+        "type": "scroll",
+        "heal": 25,
+        "value": 40,
+        "flavor_text": "A scroll that heals wounds when read."
+    },
+    {
+        "name": "Scroll of Cure Poison",
+        "type": "scroll",
+        "effect": "cure_poison",
+        "value": 25,
+        "flavor_text": "A scroll that cures poisoning effects upon reading."
+    },
+    {
+        "name": "Scroll of Shaking",
+        "type": "scroll",
+        "effect": "earthquake",
+        "value": 40,
+        "flavor_text": "A scroll that summons an earthquake to devastate enemies."
+    },
+    {
+        "name": "Scroll of Teleport",
+        "type": "scroll",
+        "effect": "teleport",
+        "value": 50,
+        "flavor_text": "A scroll that teleports the reader to a chosen location."
+    },
+    {
+        "name": "Scroll of Identify",
+        "type": "scroll",
+        "effect": "identify",
+        "value": 15,
+        "flavor_text": "A scroll that identifies the properties of an item when read."
+    },
+    {
+        "name": "Scroll of Shielding",
+        "type": "scroll",
+        "effect": "protection",
+        "value": 45,
+        "flavor_text": "A scroll that grants protective barriers against attacks."
+    },
+    {
+        "name": "Engraved Coin",
+        "type": "money",
+        "amount": 10,
+        "flavor_text": "A shiny gold coin with a pretty engraving, must be a collector's item."
+    },
+    {
+        "name": "Gold Nugget",
+        "type": "money",
+        "amount": 20,
+        "flavor_text": "A nugget of pure gold, valuable and coveted."
+    },
+    {
+        "name": "Gemstone",
+        "type": "money",
+        "amount": 50,
+        "flavor_text": "A sparkling gemstone, radiating brilliance."
+    },
+    {
+        "name": "Bag of Coins",
+        "type": "money",
+        "amount": 30,
+        "flavor_text": "A sturdy bag filled with gold coins."
+    },
+    {
+        "name": "Pile of Gold",
+        "type": "money",
+        "amount": 40,
+        "flavor_text": "A substantial pile of gleaming gold."
+    },
+    {
+        "name": "Treasure Chest",
+        "type": "money",
+        "amount": 100,
+        "flavor_text": "An ornate chest overflowing with riches."
+    },
+    {
+        "name": "Magic Ring",
+        "type": "accessory",
+        "effect": "magic_boost",
+        "value": 50,
+        "flavor_text_identified": "A ring that enhances the wearer's magical abilities.",
+        "flavor_text_unidentified": "An accessory shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Amulet of Health",
+        "type": "accessory",
+        "effect": "health_boost",
+        "value": 60,
+        "flavor_text_identified": "An amulet that increases the wearer's vitality and health.",
+        "flavor_text_unidentified": "An accessory shrouded in shadow magic. It needs to be identified."
+    },
+    {
+        "name": "Torch",
+        "type": "tool",
+        "effect": "light",
+        "value": 10,
+        "flavor_text": "A torch that illuminates dark areas."
+    },
+    {
+        "name": "Lockpick",
+        "type": "tool",
+        "effect": "unlock",
+        "value": 15,
+        "flavor_text": "A set of lockpicks, useful for opening locked doors."
+    },
+    {
+        "name": "Rope",
+        "type": "tool",
+        "effect": "climb",
+        "value": 15,
+        "flavor_text": "A sturdy rope, essential for climbing and traversing gaps."
+    },
+    {
+        "name": "Book of Spells",
+        "type": "book",
+        "effect": "learn_spell",
+        "value": 70,
+        "flavor_text": "A tome containing various spells and incantations."
+    },
+    {
+        "name": "Map",
+        "type": "tool",
+        "effect": "reveal_map",
+        "value": 25,
+        "flavor_text": "A map that reveals the layout of the dungeon."
+    },
+    {
+        "name": "Compass",
+        "type": "tool",
+        "effect": "navigation",
+        "value": 20,
+        "flavor_text": "A compass that aids in navigation through the dungeon."
+    },
+    {
+        "name": "Lantern",
+        "type": "tool",
+        "effect": "light",
+        "value": 15,
+        "flavor_text": "A lantern that provides a steady source of light."
+    },
+    {
+        "name": "Healing Herb",
+        "type": "potion",
+        "heal": 10,
+        "value": 5,
+        "flavor_text": "A simple herb that can be used to heal minor wounds."
+    },
+    {
+        "name": "Fire Resist Potion",
+        "type": "potion",
+        "effect": "fire_resist",
+        "value": 30,
+        "flavor_text": "A potion that grants temporary resistance to fire."
+    },
+    {
+        "name": "Ice Resist Potion",
+        "type": "potion",
+        "effect": "ice_resist",
+        "value": 30,
+        "flavor_text": "A potion that grants temporary resistance to ice."
+    },
+    {
+        "name": "Poison Resist Potion",
+        "type": "potion",
+        "effect": "poison_resist",
+        "value": 30,
+        "flavor_text": "A potion that grants temporary resistance to poison."
+    },
+    {
+        "name": "Shock Resist Potion",
+        "type": "potion",
+        "effect": "shock_resist",
+        "value": 30,
+        "flavor_text": "A potion that grants temporary resistance to shock."
+    },
+    {
+        "name": "Blind Resist Potion",
+        "type": "potion",
+        "effect": "blind_resist",
+        "value": 30,
+        "flavor_text": "A potion that grants temporary resistance to being blinded."
+    },
+    {
+        "name": "Scroll of Summoning",
+        "type": "scroll",
+        "effect": "summon",
+        "value": 80,
+        "flavor_text": "A scroll that summons creatures to aid the reader."
+    },
+    {
+        "name": "Scroll of Silence",
+        "type": "scroll",
+        "effect": "silence",
+        "value": 35,
+        "flavor_text": "A scroll that silences enemies, preventing them from casting spells."
+    }
+]
