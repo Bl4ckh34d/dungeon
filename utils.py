@@ -108,6 +108,20 @@ def format_encounter_line(variable, total_length=70):
     # Construct and return the centered line
     return f"{left_padding}{base_text}{right_padding}"
 
+def format_visualization_line(variable, total_length=70):
+    # Define the encounter message with the placeholder for type
+    base_text = f"| {variable} |"
+    filtered_text = re.sub(r'\[/?[a-zA-Z\s]+\]', '', variable)
+    text_to_count = f"| {filtered_text} |"
+    # Calculate the length of padding needed on each side
+    padding_needed = (total_length - len(text_to_count)) // 2
+    # Ensure we have an even distribution of '=' on both sides
+    left_padding = "=" * padding_needed
+    right_padding = "=" * (total_length - len(left_padding) - len(text_to_count))
+    
+    # Construct and return the centered line
+    return f"{left_padding}{base_text}{right_padding}"
+
 def format_battle_line(variable, total_length=70):
     # Define the encounter message with the placeholder for type
     base_text = f"| Fighting the {variable}! |"

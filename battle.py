@@ -314,7 +314,7 @@ def handle_loot(enemy):
             console.print(f"The {enemy.type['name']} dropped something and you pick it up!") #f"The {enemy.type['name']} dropped its {enemy.weapon['name']}!"
             # Ensure the weapon is marked as identified when dropped by enemies
             enemy.weapon['identified'] = False
-            enemy.weapon['name'] = f"Unidentified {enemy.weapon['type'].capitalize()}"
+            enemy.weapon['name'] = f"Shrouded {enemy.weapon['type'].capitalize()}"
 
             vars.player['inventory'].append(enemy.weapon)
     elif enemy.loot_type == 'magical':
@@ -323,7 +323,7 @@ def handle_loot(enemy):
             drop = random.choice(magical_items)
             drop = drop.copy()
             drop['identified'] = False
-            drop['name'] = f"Unidentified {drop['type'].capitalize()}"
+            drop['name'] = f"Shrouded {drop['type'].capitalize()}"
             vars.player['inventory'].append(drop)
             console.print(f"The {enemy.type['name']} dropped a {drop['name']}!")
     elif enemy.loot_type == 'treasure':
@@ -337,7 +337,7 @@ def handle_loot(enemy):
             loot = loot.copy()
             if loot['type'] in ['weapon', 'armor', 'accessory']:
                 loot['identified'] = False
-                loot['name'] = f"Unidentified {loot['type'].capitalize()}"
+                loot['name'] = f"Shrouded {loot['type'].capitalize()}"
             vars.player['inventory'].append(loot)
             console.print(f"The {enemy.type['name']} dropped a {loot['name']}!")
     time.sleep(vars.settings["delay_enemy_drop_loot"])

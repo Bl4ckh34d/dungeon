@@ -17,13 +17,13 @@
         "awareness": 2,
         "inventory": [
             {
-                "name": "Unidentified Weapon",
+                "name": "Shrouded Weapon",
                 "type": "weapon",
                 "attack": 9,
                 "effect": "burn",
                 "value": 100,
                 "flavor_text_identified": "A radiant sun sword, blazing with the power of the sun.",
-                "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified.",
+                "flavor_text_unidentified": "A weapon shrouded in shadow magic.\nIt needs to be identified before you can equip it.",
                 "identified": false
             },
             {

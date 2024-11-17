@@ -1,5 +1,42 @@
 import random
 import vars
+from rich.console import Console
+from rich.text import Text
+from utils import clear_screen, format_visualization_line
+# Initialize the rich console
+console = Console()
+
+def print_dungeon_ascii(dungeon, nodes=None, title="BSP Splitting"):
+    """Visualize the dungeon as ASCII art in the terminal with colors."""
+    clear_screen()  # Clear the screen before printing
+    console.print(format_visualization_line(title))
+
+    dungeon_height = len(dungeon)
+    dungeon_width = len(dungeon[0]) if dungeon else 0
+
+    dungeon_copy = [[cell for cell in row] for row in dungeon]
+
+    if nodes:
+        # Assign a unique color for each node
+        node_colors = [
+            "red", "green", "blue", "yellow", "magenta", "cyan", "white",
+            "bright_red", "bright_green", "bright_blue", "bright_yellow",
+            "bright_magenta", "bright_cyan", "bright_white"
+        ]
+        node_mapping = {
+            id(node): node_colors[i % len(node_colors)] for i, node in enumerate(nodes)
+        }
+
+        # Overlay the active nodes
+        for node in nodes:
+            color = node_mapping[id(node)]
+            for y in range(node.y, node.y + node.height):
+                for x in range(node.x, node.x + node.width):
+                    dungeon_copy[y][x] = f"[{color}]█[/]"  # Color for active splits
+
+    # Print the dungeon with updated visual distinctions
+    for row in dungeon_copy:
+        console.print("".join(row))
 
 class BSPNode:
     def __init__(self, x, y, width, height):
@@ -33,7 +70,7 @@ class BSPNode:
 
         return True
 
-    def create_room(self, padding=vars.settings["padding"]):
+    def create_room(self, padding=vars.settings["padding"], visualizing=vars.settings["debug"]):
         """
         Create a room within this node's boundaries.
         Padding defines the minimum distance between the room and the edges of the BSP cell.
@@ -67,6 +104,12 @@ class BSPNode:
         else:
             vars.rooms.append(room)
 
+        # Temporarily visualize the room as dark grey if in visualization mode
+        if visualizing:
+            create_room(room, visualizing=vars.settings["debug"])
+        else:
+            create_room(room)
+
         # Store the room in the node
         self.room = room
         return room
@@ -93,7 +136,7 @@ def generate_dungeon(player):
     vars.player['shops_visited'] = set()  # Reset shops visited on new floor
 
     # Carve out rooms and corridors
-    make_map()
+    make_map(visualize_split=vars.settings["debug"])
 
     # Place player in the first room
     first_room = vars.rooms[0]
@@ -123,71 +166,115 @@ def generate_dungeon(player):
     place_enemies(num_enemies)
     if random.random() < 0.5 and player['floor'] != max_floor:
         place_shop()
-
-    # Place secret rooms with 33% chance
-    if random.random() < 0.33:
-        create_secret_rooms()
         
-def make_map():
+def make_map(visualize_split=vars.settings["debug"]):
     root = BSPNode(0, 0, vars.settings["dungeon_width"], vars.settings["dungeon_height"])
     nodes = [root]
     min_size = vars.settings["min_room_size"]
 
+    # Initialize the dungeon
+    vars.dungeon = [[vars.graphic["wall_char"] for _ in range(vars.settings["dungeon_width"])]
+                    for _ in range(vars.settings["dungeon_height"])]
+    
+    if visualize_split:
+        print_dungeon_ascii(vars.dungeon, [root], title="Initial BSP Node")
+        input("Press Enter to proceed...")
+
+    # Split nodes
     while nodes:
         node = nodes.pop(0)
         if node.split(min_size):
             nodes.append(node.left)
             nodes.append(node.right)
+            if visualize_split:
+                print_dungeon_ascii(vars.dungeon, nodes, title="BSP Splitting in Progress")
+                input("Press Enter to proceed...")
 
+    # Create rooms
     rooms = []
     leaf_nodes = [node for node in get_all_leaves(root)]
-    for node in leaf_nodes:
-        room = node.create_room()
+    for i, node in enumerate(leaf_nodes):
+        room = node.create_room(visualizing=vars.settings["debug"])
         if room:
-            if not all(k in room for k in ['x', 'y', 'width', 'height']):
-                continue
             rooms.append(room)
-            create_room(room)
+            create_room(room, visualizing=vars.settings["debug"])
+            if visualize_split:
+                print_dungeon_ascii(vars.dungeon, title=f"Room {i+1} Placement")
+                input("Press Enter to proceed...")
 
-    if not rooms:
-        fallback_room = {'x': 5, 'y': 5, 'width': 10, 'height': 10}
-        rooms.append(fallback_room)
-        create_room(fallback_room)
+    # Maybe add a single secret room
+    if random.random() < vars.settings["secret_room_chance"]:
+        create_single_secret_room(rooms)
 
-    for i in range(1, len(rooms)):
-        connect_rooms(rooms[i - 1], rooms[i])
+    if visualize_split:
+        print_dungeon_ascii(vars.dungeon, title="Final Room Layout Before Hallways")
+        input("Press Enter to proceed...")
+
+    # Connect rooms efficiently
+    connect_all_rooms(rooms)
+
     vars.rooms = rooms
 
-def create_secret_rooms():
-    """Create secret rooms and connect them to the main dungeon."""
-    num_secret_rooms = random.randint(1, 3)
-    for _ in range(num_secret_rooms):
-        attempts = 0
-        while attempts < 100:
-            w = random.randint(4, 6)
-            h = random.randint(4, 6)
-            x = random.randint(1, vars.settings["dungeon_width"] - w - 2)
-            y = random.randint(1, vars.settings["dungeon_height"] - h - 2)
+def create_single_secret_room(existing_rooms):
+    """Create a single secret room and connect it to the nearest suitable room."""
+    attempts = 0
+    while attempts < 100:
+        w = random.randint(4, 6)
+        h = random.randint(4, 6)
+        x = random.randint(1, vars.settings["dungeon_width"] - w - 2)
+        y = random.randint(1, vars.settings["dungeon_height"] - h - 2)
 
-            secret_room = {'x': x, 'y': y, 'width': w, 'height': h}
+        secret_room = {'x': x, 'y': y, 'width': w, 'height': h, 'is_secret': True}
 
-            # Check for overlap
-            if any(rooms_overlap(secret_room, other_room) for other_room in vars.rooms + vars.secret_rooms):
-                attempts += 1
-                continue
+        # Check for overlap with existing rooms
+        if any(rooms_overlap(secret_room, other_room) for other_room in existing_rooms + vars.secret_rooms):
+            attempts += 1
+            continue
 
-            create_secret_room(secret_room)
+        # Create the secret room
+        create_secret_room(secret_room)
 
-            # Connect the secret room to a random room via a secret door
-            target_room = random.choice(vars.rooms)
-            connect_secret_room(secret_room, target_room)
+        # Find the nearest regular room
+        nearest_room = find_nearest_room(secret_room, existing_rooms)
+        
+        # Connect to the nearest room
+        connect_secret_room(secret_room, nearest_room)
 
-            # Place stronger enemy and loot in the secret room
-            place_strong_enemy(secret_room)
-            place_secret_room_items(secret_room)
+        # Place items and enemies
+        place_strong_enemy(secret_room)
+        place_secret_room_items(secret_room)
 
-            vars.secret_rooms.append(secret_room)
-            break
+        # Clear existing secret rooms (should be empty anyway) and add this one
+        vars.secret_rooms = [secret_room]
+        break
+
+def find_nearest_room(target_room, rooms):
+    """Find the nearest regular room to the target room."""
+    nearest = None
+    min_dist = float('inf')
+    
+    for room in rooms:
+        # Calculate distance between room centers
+        dist = abs((target_room['x'] + target_room['width']//2) - 
+                  (room['x'] + room['width']//2)) + \
+               abs((target_room['y'] + target_room['height']//2) - 
+                  (room['y'] + room['height']//2))
+        if dist < min_dist:
+            min_dist = dist
+            nearest = room
+            
+    return nearest
+
+def create_secret_room(room):
+    """Create a secret room with wall tiles."""
+    for x in range(room['x'], room['x'] + room['width']):
+        for y in range(room['y'], room['y'] + room['height']):
+            # During visualization, show as dark grey
+            if vars.settings["debug"]:
+                vars.dungeon[y][x] = "[#222222]█[/]"
+            else:
+                # During gameplay, show as wall
+                vars.dungeon[y][x] = vars.graphic["wall_char"]
 
 def create_secret_room(room):
     """Carve out the secret room with solid walls until revealed."""
@@ -195,20 +282,100 @@ def create_secret_room(room):
         for y in range(room['y'], room['y'] + room['height']):
             vars.dungeon[y][x] = vars.graphic["wall_char"]  # Render as wall initially
 
+def connect_all_rooms(rooms):
+    """Connect all rooms using an efficient spanning tree approach."""
+    if not rooms:
+        return
+
+    # Create a list of all possible connections between rooms
+    connections = []
+    for i, room1 in enumerate(rooms):
+        for j, room2 in enumerate(rooms[i+1:], i+1):
+            dist = manhattan_distance(room1, room2)
+            # Store as a tuple with distance first for proper sorting
+            connections.append((dist, i, j, room1, room2))
+
+    # Sort connections by distance
+    connections.sort()
+
+    # Keep track of connected room groups using lists instead of sets
+    connected_groups = [[room] for room in rooms]
+
+    # Connect rooms using a minimum spanning tree approach
+    for dist, i, j, room1, room2 in connections:
+        # Find the groups containing these rooms
+        group1 = next(g for g in connected_groups if room1 in g)
+        group2 = next(g for g in connected_groups if room2 in g)
+
+        # If rooms are in different groups, connect them
+        if group1 is not group2:
+            # Create corridor only if path doesn't intersect other rooms
+            if not path_intersects_rooms(room1, room2, rooms):
+                connect_rooms(room1, room2)
+                # Merge the groups by extending group1 with group2's rooms
+                group1.extend(group2)
+                connected_groups.remove(group2)
+
+def manhattan_distance(room1, room2):
+    """Calculate Manhattan distance between room centers."""
+    x1 = room1['x'] + room1['width'] // 2
+    y1 = room1['y'] + room1['height'] // 2
+    x2 = room2['x'] + room2['width'] // 2
+    y2 = room2['y'] + room2['height'] // 2
+    return abs(x1 - x2) + abs(y1 - y2)
+
+def path_intersects_rooms(room1, room2, all_rooms):
+    """Check if a potential path between rooms would intersect other rooms."""
+    # Get room centers
+    x1 = room1['x'] + room1['width'] // 2
+    y1 = room1['y'] + room1['height'] // 2
+    x2 = room2['x'] + room2['width'] // 2
+    y2 = room2['y'] + room2['height'] // 2
+
+    # Create a set of points along the potential path
+    path_points = set()
+    
+    # Add points for L-shaped path
+    for x in range(min(x1, x2), max(x1, x2) + 1):
+        path_points.add((x, y1))
+    for y in range(min(y1, y2), max(y1, y2) + 1):
+        path_points.add((x2, y))
+
+    # Check if path intersects any room (except room1 and room2)
+    for room in all_rooms:
+        if room is room1 or room is room2:
+            continue
+            
+        # Expand room bounds slightly to prevent corridors from being too close
+        for x in range(room['x'] - 1, room['x'] + room['width'] + 1):
+            for y in range(room['y'] - 1, room['y'] + room['height'] + 1):
+                if (x, y) in path_points:
+                    return True
+                    
+    return False
+
 def connect_secret_room(secret_room, target_room):
     """Connect a secret room to a normal room via a secret door."""
-    x1, y1 = secret_room['x'] + secret_room['width'] // 2, secret_room['y'] + secret_room['height'] // 2
-    x2, y2 = target_room['x'] + target_room['width'] // 2, target_room['y'] + target_room['height'] // 2
-
-    # Generate an L-shaped path
-    if random.choice([True, False]):
-        create_h_tunnel(x1, x2, y1)
-        create_v_tunnel(y1, y2, x2)
+    # Find closest points between rooms
+    closest_points = find_closest_room_points(secret_room, target_room)
+    if closest_points:
+        (x1, y1), (x2, y2) = closest_points
     else:
-        create_v_tunnel(y1, y2, x1)
-        create_h_tunnel(x1, x2, y2)
+        # Fallback to room centers if closest points cannot be found
+        x1 = secret_room['x'] + secret_room['width'] // 2
+        y1 = secret_room['y'] + secret_room['height'] // 2
+        x2 = target_room['x'] + target_room['width'] // 2
+        y2 = target_room['y'] + target_room['height'] // 2
 
-    # Place a secret door
+    # Create the corridor (hidden initially)
+    if random.choice([True, False]):
+        create_h_tunnel(x1, x2, y1, is_secret=True)
+        create_v_tunnel(y1, y2, x2, is_secret=True)
+    else:
+        create_v_tunnel(y1, y2, x1, is_secret=True)
+        create_h_tunnel(x1, x2, y2, is_secret=True)
+
+    # Place the secret door at the connection point with the target room
     vars.dungeon[y2][x2] = vars.graphic["secret_door_char"]
             
 def place_strong_enemy(room):
@@ -261,43 +428,170 @@ def rooms_overlap(room1, room2):
             room1['y'] <= room2['y'] + room2['height'] - 1 and
             room1['y'] + room1['height'] - 1 >= room2['y'])
 
-def create_room(room):
+def create_room(room, visualizing=False):
     """Carve out a room in the dungeon."""
     for x in range(room['x'], room['x'] + room['width']):
         for y in range(room['y'], room['y'] + room['height']):
-            if room.get('is_secret'):
-                vars.dungeon[y][x] = vars.graphic["wall_char"]  # Render secret rooms as walls initially
+            if room.get('is_secret') and visualizing:
+                # Display secret rooms in dark grey temporarily
+                vars.dungeon[y][x] = "[#222222]█[/]"
+            elif room.get('is_secret'):
+                # During gameplay, secret rooms are rendered as walls
+                vars.dungeon[y][x] = vars.graphic["wall_char"]
             else:
+                # Regular room floors
                 vars.dungeon[y][x] = vars.graphic["floor_char"]
 
-def connect_rooms(room1, room2):
-    """Connect two rooms with straight horizontal and vertical corridors."""
+def connect_rooms(room1, room2, visualizing=vars.settings["debug"]):
+    """Connect two rooms using an improved pathfinding approach that considers existing rooms and corridors."""
+    # Get center points of both rooms
     x1, y1 = room1['x'] + room1['width'] // 2, room1['y'] + room1['height'] // 2
     x2, y2 = room2['x'] + room2['width'] // 2, room2['y'] + room2['height'] // 2
+    
+    # Find the closest points between rooms instead of using center points
+    closest_points = find_closest_room_points(room1, room2)
+    if closest_points:
+        (x1, y1), (x2, y2) = closest_points
 
-    # Create an L-shaped connection: horizontal then vertical or vertical then horizontal
-    if random.choice([True, False]):
-        # Horizontal first
-        create_h_tunnel(x1, x2, y1)
-        create_v_tunnel(y1, y2, x2)
+    # Track visualized tiles for debugging
+    visualized_tiles = []
+    
+    # Try to find doorway points on room edges
+    door1 = find_door_point(room1, x2, y2)
+    door2 = find_door_point(room2, x1, y1)
+    
+    if door1 and door2:
+        x1, y1 = door1
+        x2, y2 = door2
+
+    # Create corridor using improved path finding
+    create_smart_corridor(x1, y1, x2, y2, visualizing, visualized_tiles)
+
+    # Visualize if needed
+    if visualizing:
+        print_dungeon_ascii(vars.dungeon, title="Hallway Created")
+        input("Press Enter to proceed...")
+
+    # Reset visualization
+    for y, x in visualized_tiles:
+        vars.dungeon[y][x] = vars.graphic["floor_char"]
+
+def find_closest_room_points(room1, room2):
+    """Find the closest points between two rooms."""
+    min_dist = float('inf')
+    closest_points = None
+    
+    # Check all points along the edges of both rooms
+    for x1 in range(room1['x'], room1['x'] + room1['width']):
+        for y1 in [room1['y'], room1['y'] + room1['height'] - 1]:
+            for x2 in range(room2['x'], room2['x'] + room2['width']):
+                for y2 in [room2['y'], room2['y'] + room2['height'] - 1]:
+                    dist = abs(x1 - x2) + abs(y1 - y2)  # Manhattan distance
+                    if dist < min_dist:
+                        min_dist = dist
+                        closest_points = ((x1, y1), (x2, y2))
+    
+    for y1 in range(room1['y'], room1['y'] + room1['height']):
+        for x1 in [room1['x'], room1['x'] + room1['width'] - 1]:
+            for y2 in range(room2['y'], room2['y'] + room2['height']):
+                for x2 in [room2['x'], room2['x'] + room2['width'] - 1]:
+                    dist = abs(x1 - x2) + abs(y1 - y2)
+                    if dist < min_dist:
+                        min_dist = dist
+                        closest_points = ((x1, y1), (x2, y2))
+    
+    return closest_points
+
+def find_door_point(room, target_x, target_y):
+    """Find the best door point on a room's edge closest to the target."""
+    candidates = []
+    
+    # Add points along horizontal edges
+    for x in range(room['x'] + 1, room['x'] + room['width'] - 1):
+        candidates.append((x, room['y']))  # Top edge
+        candidates.append((x, room['y'] + room['height'] - 1))  # Bottom edge
+    
+    # Add points along vertical edges
+    for y in range(room['y'] + 1, room['y'] + room['height'] - 1):
+        candidates.append((room['x'], y))  # Left edge
+        candidates.append((room['x'] + room['width'] - 1, y))  # Right edge
+    
+    # Find closest point to target
+    return min(candidates, key=lambda p: abs(p[0] - target_x) + abs(p[1] - target_y), default=None)
+
+def create_smart_corridor(x1, y1, x2, y2, visualizing=vars.settings["debug"], visualized_tiles=None):
+    """Create a corridor between two points using an improved pathfinding approach."""
+    # Determine the primary and secondary directions
+    dx = x2 - x1
+    dy = y2 - y1
+    
+    # Calculate intermediate points for smoother paths
+    intermediate_points = []
+    
+    # Choose path based on relative positions
+    if abs(dx) > abs(dy):
+        # Horizontal primary direction
+        mid_x = x1 + dx // 2
+        intermediate_points = [
+            (mid_x, y1),
+            (mid_x, y2),
+            (x2, y2)
+        ]
     else:
-        # Vertical first
-        create_v_tunnel(y1, y2, x1)
-        create_h_tunnel(x1, x2, y2)
+        # Vertical primary direction
+        mid_y = y1 + dy // 2
+        intermediate_points = [
+            (x1, mid_y),
+            (x2, mid_y),
+            (x2, y2)
+        ]
+    
+    # Connect all points
+    current = (x1, y1)
+    for next_point in intermediate_points:
+        connect_points(current[0], current[1], next_point[0], next_point[1], visualizing, visualized_tiles)
+        current = next_point
 
-    # Place a secret door if one of the rooms is secret
-    if room1.get('is_secret') or room2.get('is_secret'):
-        vars.dungeon[y2][x2] = vars.graphic["secret_door_char"]
+def connect_points(x1, y1, x2, y2, visualizing=vars.settings["debug"], visualized_tiles=None):
+    """Connect two points with a straight line while avoiding obstacles."""
+    # Create horizontal or vertical line
+    if x1 == x2:  # Vertical line
+        for y in range(min(y1, y2), max(y1, y2) + 1):
+            place_corridor_tile(x1, y, visualizing, visualized_tiles)
+    else:  # Horizontal line
+        for x in range(min(x1, x2), max(x1, x2) + 1):
+            place_corridor_tile(x, y1, visualizing, visualized_tiles)
 
-def create_h_tunnel(x1, x2, y):
+def place_corridor_tile(x, y, visualizing=vars.settings["debug"], visualized_tiles=None):
+    """Place a corridor tile while respecting existing structures."""
+    # Don't override room floors or existing corridors
+    if vars.dungeon[y][x] not in [vars.graphic["floor_char"], vars.graphic["secret_floor_char"]]:
+        if visualizing:
+            if visualized_tiles is not None:
+                visualized_tiles.append((y, x))
+            vars.dungeon[y][x] = "[#444444]█[/]"
+        else:
+            vars.dungeon[y][x] = vars.graphic["floor_char"]
+
+def create_h_tunnel(x1, x2, y, is_secret=False, visualizing=False, visualized_tiles=None):
     """Create a horizontal tunnel."""
     for x in range(min(x1, x2), max(x1, x2) + 1):
-        vars.dungeon[y][x] = vars.graphic["floor_char"]  # Use floor_char for normal hallways
+        if visualizing:
+            if visualized_tiles is not None:
+                visualized_tiles.append((y, x))
+            vars.dungeon[y][x] = "[#444444]█[/]"
+        else:
+            vars.dungeon[y][x] = vars.graphic["wall_char"] if is_secret else vars.graphic["floor_char"]
 
-def create_v_tunnel(y1, y2, x):
+def create_v_tunnel(y1, y2, x, is_secret=False, visualizing=False, visualized_tiles=None):
     """Create a vertical tunnel."""
     for y in range(min(y1, y2), max(y1, y2) + 1):
-        vars.dungeon[y][x] = vars.graphic["floor_char"]  # Use floor_char for normal hallways
+        if visualizing:
+            if visualized_tiles is not None:
+                visualized_tiles.append((y, x))
+            vars.dungeon[y][x] = "[#444444]█[/]"
+        else:
+            vars.dungeon[y][x] = vars.graphic["wall_char"] if is_secret else vars.graphic["floor_char"]
 
 def place_random_items(symbol, count, rare=False):
     for _ in range(count):

@@ -5,7 +5,7 @@
         "attack": 3,
         "value": 20,
         "flavor_text_identified": "A sturdy iron sword, reliable in battle.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Steel Axe",
@@ -13,7 +13,7 @@
         "attack": 5,
         "value": 35,
         "flavor_text_identified": "A heavy steel axe, perfect for cleaving through armor.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Fire Wand",
@@ -23,7 +23,7 @@
         "value": 50,
         "range": true,
         "flavor_text_identified": "A wand imbued with the essence of fire, unleashing flames upon foes.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Ice Staff",
@@ -33,7 +33,7 @@
         "value": 50,
         "range": true,
         "flavor_text_identified": "A staff chilled with the power of ice, capable of freezing enemies in their tracks.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Poison Dagger",
@@ -42,7 +42,7 @@
         "effect": "poison",
         "value": 45,
         "flavor_text_identified": "A dagger coated with deadly poison, ensuring enemies suffer long after the strike.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Lightning Rod",
@@ -52,7 +52,7 @@
         "value": 55,
         "range": true,
         "flavor_text_identified": "A rod that channels lightning, striking foes from afar with electric fury.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Bow",
@@ -61,7 +61,7 @@
         "value": 40,
         "range": true,
         "flavor_text_identified": "A finely crafted bow, perfect for ranged attacks.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Crossbow",
@@ -70,7 +70,7 @@
         "value": 60,
         "range": true,
         "flavor_text_identified": "A crossbow with enhanced power, delivering bolts with deadly precision.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Magic Staff",
@@ -80,7 +80,7 @@
         "value": 70,
         "range": true,
         "flavor_text_identified": "A staff pulsing with magical energy, augmenting the wielder's spells.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Mithril Sword",
@@ -88,7 +88,7 @@
         "attack": 7,
         "value": 60,
         "flavor_text_identified": "A lightweight mithril sword, combining strength with agility.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Obsidian Blade",
@@ -97,7 +97,7 @@
         "effect": "bleed",
         "value": 75,
         "flavor_text_identified": "A blade forged from obsidian, causing deep wounds that bleed profusely.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Enchanted Bow",
@@ -107,7 +107,7 @@
         "value": 65,
         "range": true,
         "flavor_text_identified": "An enchanted bow that electrifies arrows, shocking enemies upon impact.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Shadow Dagger",
@@ -116,7 +116,7 @@
         "effect": "curse",
         "value": 80,
         "flavor_text_identified": "A dagger enveloped in shadows, cursing those it strikes.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Sun Sword",
@@ -125,7 +125,7 @@
         "effect": "burn",
         "value": 100,
         "flavor_text_identified": "A radiant sun sword, blazing with the power of the sun.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Storm Hammer",
@@ -134,7 +134,7 @@
         "effect": "shock",
         "value": 110,
         "flavor_text_identified": "A hammer crackling with storm energy, delivering electrifying blows.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Frost Bow",
@@ -144,7 +144,7 @@
         "value": 90,
         "range": true,
         "flavor_text_identified": "A bow imbued with frost, freezing arrows mid-flight to immobilize targets.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Venom Blade",
@@ -153,7 +153,7 @@
         "effect": "poison",
         "value": 85,
         "flavor_text_identified": "A blade dripping with venom, poisoning enemies with each strike.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Dragon Slayer",
@@ -161,7 +161,7 @@
         "attack": 12,
         "value": 150,
         "flavor_text_identified": "A legendary sword forged to slay dragons, pulsating with ancient power.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Staff of Healing",
@@ -170,7 +170,7 @@
         "effect": "heal",
         "value": 75,
         "flavor_text_identified": "A staff that radiates healing energy, restoring vitality to the bearer.",
-        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "A weapon shrouded in shadow magic. It needs to be identified\nbefore you can wield it."
     },
     {
         "name": "Leather Armor",
@@ -178,7 +178,7 @@
         "defense": 2,
         "value": 25,
         "flavor_text_identified": "Lightweight leather armor, offering basic protection without hindering movement.",
-        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified\n before you can wear it."
     },
     {
         "name": "Chainmail",
@@ -186,7 +186,7 @@
         "defense": 4,
         "value": 45,
         "flavor_text_identified": "Interlocking chainmail, providing robust defense against physical attacks.",
-        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified\n before you can wear it."
     },
     {
         "name": "Dragon Scale",
@@ -194,7 +194,7 @@
         "defense": 6,
         "value": 70,
         "flavor_text_identified": "Armor crafted from dragon scales, offering exceptional protection and resilience.",
-        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified\n before you can wear it."
     },
     {
         "name": "Platinum Shield",
@@ -202,7 +202,7 @@
         "defense": 5,
         "value": 50,
         "flavor_text_identified": "A shiny platinum shield, reflecting attacks and providing solid defense.",
-        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified\n before you can wear it."
     },
     {
         "name": "Helmet of Insight",
@@ -210,7 +210,7 @@
         "defense": 2,
         "value": 30,
         "flavor_text_identified": "A helmet that grants enhanced perception and awareness to its wearer.",
-        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified\n before you can wear it."
     },
     {
         "name": "Boots of Speed",
@@ -218,7 +218,7 @@
         "defense": 1,
         "value": 25,
         "flavor_text_identified": "Boots that increase the wearer's speed, allowing for swift maneuvers.",
-        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified\n before you can wear it."
     },
     {
         "name": "Gauntlets of Strength",
@@ -227,16 +227,16 @@
         "attack": 1,
         "value": 35,
         "flavor_text_identified": "Gauntlets that enhance the wearer's strength, enabling powerful strikes.",
-        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified\n before you can wear it."
     },
     {
-        "name": "Cloak of Shrouding",
+        "name": "Cloak of Shadow",
         "type": "armor",
         "defense": 3,
         "effect": "invisibility",
         "value": 90,
         "flavor_text_identified": "A cloak that renders the wearer invisible, perfect for stealth operations.",
-        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified\n before you can wear it."
     },
     {
         "name": "Reflective Shield",
@@ -245,7 +245,7 @@
         "effect": "reflect",
         "value": 80,
         "flavor_text_identified": "A shield capable of reflecting magical attacks back to their source.",
-        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified\n before you can wear it."
     },
     {
         "name": "Armor of Healing",
@@ -254,7 +254,7 @@
         "effect": "regenerate",
         "value": 500,
         "flavor_text_identified": "Armor that slowly regenerates the wearer's health over time.",
-        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified."
+        "flavor_text_unidentified": "Armor shrouded in shadow magic. It needs to be identified\n before you can wear it."
     },
     {
         "name": "Health Potion",
@@ -264,13 +264,6 @@
         "flavor_text": "A red potion that restores health when consumed."
     },
     {
-        "name": "Mana Potion",
-        "type": "potion",
-        "mana": 20,
-        "value": 20,
-        "flavor_text": "A blue potion that replenishes mana for casting spells."
-    },
-    {
         "name": "Elixir of Life",
         "type": "potion",
         "heal": 50,
@@ -278,7 +271,7 @@
         "flavor_text": "A rare elixir that significantly restores health."
     },
     {
-        "name": "Potion of Shrouding",
+        "name": "Potion of Shadow",
         "type": "potion",
         "effect": "invisibility",
         "value": 50,
@@ -299,21 +292,21 @@
         "flavor_text": "A salve that soothes burn injuries."
     },
     {
-        "name": "Potion of Strength",
+        "name": "Potion of Power",
         "type": "potion",
         "effect": "strength",
         "value": 40,
         "flavor_text": "A potion that temporarily increases your strength."
     },
     {
-        "name": "Potion of Defense",
+        "name": "Potion of Rock",
         "type": "potion",
         "effect": "defense",
         "value": 40,
         "flavor_text": "A potion that temporarily boosts your defense."
     },
     {
-        "name": "Potion of Speed",
+        "name": "Potion of Wind",
         "type": "potion",
         "effect": "speed",
         "value": 40,

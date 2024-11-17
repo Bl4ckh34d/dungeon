@@ -23,7 +23,7 @@ def find_item(y, x):
         item = item.copy()  # Create a copy to avoid modifying the original
         if item['type'] in ['weapon', 'armor', 'accessory']:
             item['identified'] = False
-            item['name'] = f"Unidentified {item['type'].capitalize()}"
+            item['name'] = f"Shrouded {item['type'].capitalize()}"
         vars.player['inventory'].append(item)
         console.print(vars.message["notification"]["found_item"].format(item=item['name']))
     else:
