@@ -32,16 +32,20 @@ def encounter_enemies(enemies):
         adjacent_enemies = [enemy for enemy in vars.enemies if is_adjacent(enemy.pos, vars.player['pos'])]
         if adjacent_enemies:
             enemies = adjacent_enemies
+        if len(enemies) > 2:
+            enemy_names = ", ".join([enemy.type['name'] for enemy in enemies[:-1]]) + ", and " + enemies[-1].type['name']
+        elif len(enemies) == 2:
+            enemy_names = " and ".join([enemy.type['name'] for enemy in enemies])
+        else:
+            enemy_names = enemies[0].type['name']
         display_dungeon()
         console.print(vars.message["notification"]["player_action"])
         handle_status_effects()
         action = console.input(vars.message["notification"]["cursor"]).upper()
-        # time.sleep(vars.settings["delay_player_action"])
+        time.sleep(vars.settings["delay_player_action"] / 2)
         if action == 'A':
             display_dungeon()
             console.print(format_battle_line(enemy_names))
-
-            # Player chooses which enemy to attack
             if len(enemies) > 1:
                 console.print(vars.message["battle"]["choose_enemy"])
                 for idx, enemy in enumerate(enemies):
@@ -53,7 +57,8 @@ def encounter_enemies(enemies):
                     target_enemy = enemies[int(choice) - 1]
             else:
                 target_enemy = enemies[0]
-
+            display_dungeon()
+            console.print(format_battle_line(enemy_names))
             weapon = vars.player['equipped']['weapon']
             weapon_attack = weapon['attack'] if weapon and 'attack' in weapon else 0
             damage_to_enemy = max(0, vars.player['attack'] + weapon_attack - target_enemy.defense + random.randint(-2, 2))

@@ -85,6 +85,7 @@ def move_player(direction):
                     return
             elif cell == vars.graphic["shop_char"]:
                 enter_shop((new_y, new_x))
+                vars.player['pos'] = [new_y, new_x]
             else:
                 vars.player['pos'] = [new_y, new_x]
 

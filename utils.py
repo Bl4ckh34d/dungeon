@@ -2,6 +2,7 @@ import time
 import vars
 import sys
 import os
+import re
 
 def display_dungeon():
     clear_screen()
@@ -93,32 +94,33 @@ def get_limited_input(prompt, max_length):
         time.sleep(vars.settings["delay_input_truncated"])
     
     return user_input
-
-def format_encounter_line(variable, total_length=89):
+def format_encounter_line(variable, total_length=70):
     # Define the encounter message with the placeholder for type
-    base_text = f"You encountered a [bold red]{variable}[/bold red]!"
-    
+    base_text = f"| You encountered a {variable}! |"
+    filtered_text = re.sub(r'\[/?[a-zA-Z\s]+\]', '', variable)
+    text_to_count = f"| You encountered a {filtered_text}! |"
     # Calculate the length of padding needed on each side
-    padding_needed = (total_length - len(base_text)) // 2
+    padding_needed = (total_length - len(text_to_count)) // 2
     # Ensure we have an even distribution of '=' on both sides
     left_padding = "=" * padding_needed
-    right_padding = "=" * (total_length - len(left_padding) - len(base_text))
+    right_padding = "=" * (total_length - len(left_padding) - len(text_to_count))
     
     # Construct and return the centered line
-    return f"{left_padding} {base_text} {right_padding}"
+    return f"{left_padding}{base_text}{right_padding}"
 
-def format_battle_line(variable, total_length=89):
+def format_battle_line(variable, total_length=70):
     # Define the encounter message with the placeholder for type
-    base_text = f"Fighting the [bold red]{variable}[/bold red]!"
-    
+    base_text = f"| Fighting the {variable}! |"
+    filtered_text = re.sub(r'\[/?[a-zA-Z\s]+\]', '', variable)
+    text_to_count = f"| Fighting the {filtered_text}! |"
     # Calculate the length of padding needed on each side
-    padding_needed = (total_length - len(base_text)) // 2
+    padding_needed = (total_length - len(text_to_count)) // 2
     # Ensure we have an even distribution of '=' on both sides
     left_padding = "=" * padding_needed
-    right_padding = "=" * (total_length - len(left_padding) - len(base_text))
+    right_padding = "=" * (total_length - len(left_padding) - len(text_to_count))
     
     # Construct and return the centered line
-    return f"{left_padding} {base_text} {right_padding}"
+    return f"{left_padding}{base_text}{right_padding}"
 
 def format_stats_line(player, total_length=69):
     # Define the encounter message with the placeholder for type
