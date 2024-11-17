@@ -19,7 +19,7 @@ def fire_ranged_weapon(weapon):
     elif choice.isdigit() and 1 <= int(choice) <= len(targets):
         target_enemy = targets[int(choice)-1]
         # Fire projectile towards the enemy
-        create_player_projectile(target_enemy.pos, weapon)
+        create_player_projectile(target_enemy.pos, weapon, target_enemy)
     else:
         console.print(vars.message["warning"]["invalid_choice"])
 
@@ -35,7 +35,7 @@ def get_targets_in_line_of_sight():
             targets.append(enemy)
     return targets
 
-def create_player_projectile(target_pos, weapon):
+def create_player_projectile(target_pos, weapon, target):
     dy = target_pos[0] - vars.player['pos'][0]
     dx = target_pos[1] - vars.player['pos'][1]
     distance = math.hypot(dx, dy)
@@ -63,5 +63,5 @@ def create_player_projectile(target_pos, weapon):
         'weapon': weapon
     }
     vars.projectiles.append(projectile)
-    console.print(vars.message["battle"]["shoot_projectile"])
+    console.print(vars.message["battle"]["shoot_projectile"].format(type=target.type['name']))
     time.sleep(vars.settings["delay_shoot_projectile"])

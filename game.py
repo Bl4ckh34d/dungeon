@@ -135,7 +135,7 @@ def main_game_loop():
                     damage = max(0, vars.player['attack'] + weapon_attack - enemy_hit.defense + random.randint(-2, 2))
                     enemy_hit.health -= damage
                     console.print(vars.message["battle"]["enemy_hit_by_projectile"].format(enemy=enemy_hit.type['name'], damage=damage))
-                    if weapon and 'effect' in weapon:
+                    if weapon and 'effect' in weapon and damage > 0:
                         apply_status_effect(enemy_hit, weapon['effect'])
                     vars.projectiles.remove(p)
                     if enemy_hit.health <= 0:
