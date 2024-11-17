@@ -1,15 +1,19 @@
-from main import clear_screen, check_level_up, get_limited_input, apply_status_effect, fire_ranged_weapon, equip_item
+from utils import clear_screen
 from rich.table import Table
+from vars import console
 import random
 import json
 import time
 import vars
-from vars import console
 import sys
 import os
 
 # Show menu with Save and Load options
 def show_menu():
+    
+    from player import check_level_up
+    
+    
     while True:
         clear_screen()
         console.print(vars.message["notification"]["menu_line"])
@@ -43,6 +47,19 @@ def show_menu():
         equipped_weapon = vars.message["notification"]["equipped_weapon"].format(weapon=weapon["name"] if weapon else "")
         equipped_armor = vars.message["notification"]["equipped_armor"].format(armor=armor["name"] if armor else "")
         equipped_accessory = vars.message["notification"]["equipped_accessory"].format(accessory=accessory["name"] if accessory else "")
+        status_title = vars.message["notification"]["player_status"].format(
+            status=", ".join(
+                f"  "+f"{effect['effect']} (Duration: {effect['duration']})"
+                for effect in vars.player['status_effects']
+            ) if vars.player['status_effects'] else "  No status effects"
+        )
+
+        # Limit to the first 5 effects and pad with empty strings
+        status_fields = [
+            f"{effect['effect']} (Duration: {effect['duration']})"
+            for effect in vars.player['status_effects'][:5]
+        ]
+        status_fields += [""] * (5 - len(status_fields))
         
         enemies_killed = vars.message["notification"]["enemies_killed"].format(count=0)
         items_found = vars.message["notification"]["items_found"].format(count=0)
@@ -66,6 +83,8 @@ def show_menu():
             equipped_weapon,
             equipped_armor,
             equipped_accessory,
+            status_title,
+            *status_fields,
             enemies_killed,
             items_found,
             shops_visited,
@@ -122,6 +141,8 @@ def show_menu():
 # Save game state to a JSON file
 def save_game():
     
+    from utils import get_limited_input
+    
     clear_screen()
     console.print(vars.message["notification"]["save_title"])
     console.print()
@@ -172,7 +193,9 @@ def save_game():
     time.sleep(vars.settings["delay_save_game"])
 
 def load_game():
+    
     from enemy import Enemy
+    from utils import clear_screen
     
     clear_screen()
     console.print(vars.message["notification"]["load_game"])
@@ -341,6 +364,11 @@ def delete_save():
     time.sleep(vars.settings["delay_delete_save"])
 
 def use_item():
+    
+    from projectiles import fire_ranged_weapon
+    from battle import apply_status_effect
+    from items import equip_item
+    
     clear_screen()
     console.print(vars.message["notification"]["inventory_line"])
     console.print()
@@ -456,6 +484,10 @@ def show_item_details(item):
         console.print()
         
 def use_specific_item(item):
+    
+    from battle import apply_status_effect
+    from items import equip_item
+    
     if item['type'] == 'potion':
         if 'heal' in item:
             vars.player['health'] = min(vars.player['max_health'], vars.player['health'] + item['heal'])
@@ -724,6 +756,9 @@ def determine_player_class():
 
 # Show inventory with flavor text
 def show_inventory():
+    
+    from items import equip_item
+    
     while True:
         clear_screen()
         console.print(vars.message["notification"]["inventory_line"])
@@ -766,32 +801,37 @@ def show_inventory():
             
             if choice == '':
                 break
-            elif choice.isdigit() and 1 <= int(choice) <= len(vars.player['inventory']):
-                item = vars.player['inventory'][int(choice) - 1]
-                show_item_details(item)
-                console.print(vars.message["notification"]["show_inventory_control_line"])
-                action = console.input(vars.message["notification"]["cursor"]).upper()
-                if action == 'E':
-                    if not item.get('identified', True):
-                        console.print("You need to identify this item before equipping it.")
-                        time.sleep(vars.settings["delay_need_to_identify"])
+            elif choice.isdigit():
+                idx = int(choice) - 1
+                if 0 <= idx < len(vars.player['inventory']):
+                    item = vars.player['inventory'][idx]
+                    show_item_details(item)
+                    console.print(vars.message["notification"]["show_inventory_control_line"])
+                    action = console.input(vars.message["notification"]["cursor"]).upper()
+                    if action == 'E':
+                        if not item.get('identified', True):
+                            console.print("You need to identify this item before equipping it.")
+                            time.sleep(vars.settings["delay_need_to_identify"])
+                        else:
+                            equip_item(item)
+                            vars.player['inventory'].pop(idx)
+                    elif action == 'U':
+                        if not item.get('identified', True):
+                            console.print("You need to identify this item before using it.")
+                            time.sleep(vars.settings["delay_need_to_identify"])
+                        else:
+                            use_specific_item(item)
+                    elif action == '':
+                        continue
                     else:
-                        equip_item(item)
-                        vars.player['inventory'].pop(int(choice) - 1)
-                elif action == 'U':
-                    if not item.get('identified', True):
-                        console.print("You need to identify this item before using it.")
-                        time.sleep(vars.settings["delay_need_to_identify"])
-                    else:
-                        use_specific_item(item)
-                elif action == '':
-                    continue
+                        time.sleep(vars.settings["delay_invalid_choice"])
+                        clear_screen()
                 else:
+                    console.print("Invalid choice. Please select a valid item index.")
                     time.sleep(vars.settings["delay_invalid_choice"])
-                    clear_screen()
             else:
+                console.print("Invalid choice. Please enter a number corresponding to an item.")
                 time.sleep(vars.settings["delay_invalid_choice"])
-                clear_screen()
         else:
             # Add empty rows to meet the minimum row count if inventory is empty
             for _ in range(vars.settings["min_rows"]):

@@ -68,6 +68,7 @@
         "ice": "You are frozen!",
         "shock": "You are shocked!",
         "blind": "You are blinded!",
+        "silence": "You are silenced!",
         "heal": "You feel rejuvenated!",
         "cure": "You are cured of poison!",
         "extinguished": "You are extinguished!",
@@ -187,6 +188,8 @@
         "shops_visited": "  Shops visited:      {count}",
         "gold_found": "  Gold collected:     {count}",
         "items_purchased": "  Wares purchased:    {count}",
+        "player_status": "  Status Effects:",
+        "level_up": "[green]You have leveled up to level [blue]{level}[/blue]![/green]",
         "cursor": " > "
     },
     "input": {

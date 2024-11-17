@@ -2,22 +2,25 @@
     "effect_damage": {
         "POISON_DAMAGE" : 1,
         "BURN_DAMAGE" : 2,
+        "FROST_DAMAGE": 2,
         "SHOCK_DAMAGE" : 3,
         "FIREBALL_DAMAGE" : 15,
         "ICE_SHARD_DAMAGE" : 10,
         "LIGHTNING_DAMAGE" : 12
     },
     "effect": [
-        { "effect": "[bold green]poison[/bold green]", "duration": 5 },
-        { "effect": "[bold red]burn[/bold red]", "duration": 3 },
-        { "effect": "[bold #90D5FF]freeze[/bold #90D5FF]", "duration": 2 },
-        { "effect": "[bold blue]shock[/bold blue]", "duration": 1 },
-        { "effect": "[bold #f2d2fe]invisibility[/bold #f2d2fe]", "duration": 5 },
-        { "effect": "[bold #4a412f]blindness[/bold #4a412f]", "duration": 5 },
-        { "effect": "poison_resist", "duration": 10 },
-        { "effect": "fire_resist", "duration": 10 },
-        { "effect": "ice_resist", "duration": 10 },
-        { "effect": "shock_resist", "duration": 10 },
-        { "effect": "blind_resist", "duration": 10 }
+        { "id": 0, "effect": "[bold green]Poison[/bold green]", "duration": 5 },
+        { "id": 1, "effect": "[bold red]Burning[/bold red]", "duration": 3 },
+        { "id": 2, "effect": "[bold #90D5FF]Freezing[/bold #90D5FF]", "duration": 2 },
+        { "id": 3, "effect": "[bold blue]Shock[/bold blue]", "duration": 1 },
+        { "id": 4, "effect": "[bold #f2d2fe]Invisibility[/bold #f2d2fe]", "duration": 5 },
+        { "id": 5, "effect": "[bold #4a412f]Blindness[/bold #4a412f]", "duration": 5 },
+        { "id": 6, "effect": "[bold #a020f0]Silence[/bold #a020f0]", "duration": 5 },
+        { "id": 7, "effect": "Poison Resistance", "duration": 10 },
+        { "id": 8, "effect": "Fire Resistance", "duration": 10 },
+        { "id": 9, "effect": "Cold Resistance", "duration": 10 },
+        { "id": 10, "effect": "Shock Resistance", "duration": 10 },
+        { "id": 11, "effect": "Blind Resistance", "duration": 10 },
+        { "id": 12, "effect": "Silence Resistance", "duration": 10 }
     ]
 }

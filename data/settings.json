@@ -2,6 +2,7 @@
     "dungeon_height": 20,
     "dungeon_width": 70,
     "padding": 1,
+    "min_room_size": 6,
     "secret_room_chance": 0.2,
     "min_rows": 17,
     "delay_next_floor": 1,

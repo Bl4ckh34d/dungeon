@@ -1,9 +1,5 @@
-import os
-import sys
-import json
 import random
 import vars
-from utils import get_line
 
 class BSPNode:
     def __init__(self, x, y, width, height):
@@ -44,7 +40,6 @@ class BSPNode:
         """
         # Ensure there's enough space for padding on all sides
         if self.width <= 2 * padding or self.height <= 2 * padding:
-            print(f"Skipping room creation due to insufficient size: width={self.width}, height={self.height}")
             return None
 
         # Define room size within the available space
@@ -136,42 +131,32 @@ def generate_dungeon(player):
 def make_map():
     root = BSPNode(0, 0, vars.settings["dungeon_width"], vars.settings["dungeon_height"])
     nodes = [root]
-    min_size = 8
+    min_size = vars.settings["min_room_size"]
 
-    # Split the nodes until they are small enough
     while nodes:
         node = nodes.pop(0)
         if node.split(min_size):
             nodes.append(node.left)
             nodes.append(node.right)
 
-    # Generate rooms in leaf nodes
     rooms = []
     leaf_nodes = [node for node in get_all_leaves(root)]
-    print(f"Number of leaf nodes: {len(leaf_nodes)}")  # Debug print
-
     for node in leaf_nodes:
         room = node.create_room()
         if room:
             if not all(k in room for k in ['x', 'y', 'width', 'height']):
-                print(f"Malformed room: {room}")  # Debug output
                 continue
             rooms.append(room)
             create_room(room)
 
-    # Fallback if no rooms
     if not rooms:
-        print("No rooms were created! Creating fallback room.")
         fallback_room = {'x': 5, 'y': 5, 'width': 10, 'height': 10}
         rooms.append(fallback_room)
         create_room(fallback_room)
 
-    # Connect the rooms
     for i in range(1, len(rooms)):
         connect_rooms(rooms[i - 1], rooms[i])
-
     vars.rooms = rooms
-    print(f"Number of rooms created: {len(vars.rooms)}")  # Debug print
 
 def create_secret_rooms():
     """Create secret rooms and connect them to the main dungeon."""
@@ -185,11 +170,6 @@ def create_secret_rooms():
             y = random.randint(1, vars.settings["dungeon_height"] - h - 2)
 
             secret_room = {'x': x, 'y': y, 'width': w, 'height': h}
-
-            # Debugging output
-            print("Checking overlap with rooms:")
-            print("Current secret room:", secret_room)
-            print("Existing rooms and secret rooms:", vars.rooms + vars.secret_rooms)
 
             # Check for overlap
             if any(rooms_overlap(secret_room, other_room) for other_room in vars.rooms + vars.secret_rooms):
@@ -274,7 +254,6 @@ def rooms_overlap(room1, room2):
     required_keys = ['x', 'y', 'width', 'height']
     for key in required_keys:
         if key not in room1 or key not in room2:
-            print(f"Malformed room: room1={room1}, room2={room2}")  # Debug print
             return False
 
     return (room1['x'] <= room2['x'] + room2['width'] - 1 and
@@ -380,15 +359,11 @@ def place_shop():
             vars.dungeon[y][x] = vars.graphic["shop_char"]
             break
         attempts += 1
-        
-def is_secret_door(tile):
-    """Determine if a tile is part of a secret door."""
-    for room in vars.secret_rooms:
-        if room_contains_tile(room, tile):
-            return True
-    return False
 
 def reveal_secret_room(secret_door_pos):
+    
+    from utils import room_contains_tile
+    
     """Reveal the secret room and its connected hallway."""
     for room in vars.secret_rooms:
         if room_contains_tile(room, secret_door_pos):
@@ -406,14 +381,12 @@ def reveal_secret_room(secret_door_pos):
             break
 
 def connect_to_hallway(secret_door_pos, room):
+    
+    from utils import get_line
+    
     """Reveals the hallway connecting the door to the center of the secret room."""
     path = get_line(secret_door_pos[1], secret_door_pos[0],
                     room['x'] + room['settings["dungeon_width"]'] // 2,
                     room['y'] + room['settings["dungeon_height"]'] // 2)
     for x, y in path:
         vars.dungeon[y][x] = vars.graphic["floor_char"]
-
-def room_contains_tile(room, tile):
-    """Check if a tile is within the bounds of a room."""
-    return room['x'] <= tile[1] < room['x'] + room['width'] and \
-           room['y'] <= tile[0] < room['y'] + room['height']

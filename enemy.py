@@ -2,7 +2,6 @@ import math
 import uuid
 import random
 import vars
-from utils import get_line
 from vars import console
 
 # Enemy class
@@ -85,6 +84,9 @@ class Enemy:
             self.pos = [new_y, new_x]
 
     def in_line_of_sight(self, player_pos):
+        
+        from utils import get_line
+        
         # Line of sight in 360 degrees
         path = get_line(self.pos[1], self.pos[0], player_pos[1], player_pos[0])
         for x, y in path:
