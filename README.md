@@ -29,7 +29,7 @@ Welcome to **Dungeon**, an immersive fantasy adventure where you brave procedura
    ```
 4. Run the game in any terminal:
    ```bash
-   python main.py
+   python game.py
    ```
 
 ## 📜 License
