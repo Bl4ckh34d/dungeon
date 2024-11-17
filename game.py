@@ -1,8 +1,25 @@
 from vars import console
+from threading import Thread
+import platform
+import os
 import random
 import vars
 import time
 import sys
+
+# Helper function to stop FFmpeg
+def stop_music():
+    if platform.system() == "Windows":
+        os.system("taskkill /IM ffmpeg.exe /F")
+    else:
+        os.system("pkill ffmpeg")
+        
+# Function to play music using FFmpeg
+def play_music(file):
+    if platform.system() == "Windows":
+        os.system(f'ffplay -nodisp -autoexit -loop 0 "{file}" > nul 2>&1')
+    else:
+        os.system(f'ffplay -nodisp -autoexit -loop 0 "{file}" > /dev/null 2>&1')
 
 def game_over():
     console.print()
@@ -14,10 +31,12 @@ def game_over():
     elif choice == "Q":
         console.print()
         console.print(vars.message["game_over"]["thank_you"])
+        stop_music()
         sys.exit()
     else:
         console.print()
         console.print(vars.message["game_over"]["invalid_choice"])
+        stop_music()
         sys.exit()
 
 def reset_game():
@@ -148,4 +167,7 @@ def main_game_loop():
             break
         
 if __name__ == "__main__":
+    # Start music playback in a background thread
+    music_thread = Thread(target=play_music, args=("music/music1.mp3",), daemon=True)
+    music_thread.start()
     main_game_loop()

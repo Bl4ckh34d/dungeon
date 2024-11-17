@@ -7,7 +7,7 @@ from vars import console
 # Enemy class
 class Enemy:
     def __init__(self, enemy_type, y, x):
-        self.rand = random.randint(-vars.player['level'], vars.player['level'])
+        self.rand = random.randint(0, vars.player['level'])
         self.type = enemy_type
         self.health = enemy_type['base_max_health'] + self.rand * 2
         self.max_health = self.health

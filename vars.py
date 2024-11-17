@@ -10,6 +10,12 @@ except ImportError:
     os.system('pip install rich')
     from rich import print
     from rich.console import Console
+try:
+    import ffmpeg
+except ImportError:
+    print("The 'ffmpeg' library is not installed. Installing now...")
+    os.system('pip install ffmpeg')
+    import ffmpeg
     
 console = Console()
 dungeon = []

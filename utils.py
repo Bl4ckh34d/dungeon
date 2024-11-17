@@ -122,23 +122,34 @@ def format_visualization_line(variable, total_length=70):
     # Construct and return the centered line
     return f"{left_padding}{base_text}{right_padding}"
 
-def format_battle_line(variable, total_length=70):
-    # Define the encounter message with the placeholder for type
-    base_text = f"| Fighting the {variable}! |"
-    filtered_text = re.sub(r'\[/?[a-zA-Z\s]+\]', '', variable)
-    text_to_count = f"| Fighting the {filtered_text}! |"
-    # Calculate the length of padding needed on each side
-    padding_needed = (total_length - len(text_to_count)) // 2
-    # Ensure we have an even distribution of '=' on both sides
-    left_padding = "=" * padding_needed
-    right_padding = "=" * (total_length - len(left_padding) - len(text_to_count))
+def format_status_bar(player_health, player_max_health, player_mana, player_max_mana, total_length=70):
+    # Define the encounter message
+    base_text = vars.message['notification']['player_action']
+    # Remove any markup or tags for text length calculation
+    filtered_text = re.sub(r'\[/?[a-zA-Z\s]+\]', '', base_text)
+    text_length = len(filtered_text)
     
-    # Construct and return the centered line
-    return f"{left_padding}{base_text}{right_padding}"
+    # Calculate available space for each bar on either side of the text
+    available_space = (total_length - text_length) // 2 - 1  # Reserve 1 for the `-`
+    
+    # Calculate the lengths of the filled bars based on proportions
+    left_fill_length = int(available_space * (player_health / player_max_health))
+    right_fill_length = int(available_space * (player_mana / player_max_mana))
+    
+    # Calculate the padding (spaces) between the `-` and the `=`
+    left_padding = available_space - left_fill_length
+    right_padding = available_space - right_fill_length
+
+    # Construct the bars
+    left_bar = "[red]" + " " * left_padding + "-" + "=" * left_fill_length + "[/red]"
+    right_bar = "[cyan]" + "=" * right_fill_length + "-" + " " * right_padding + "[/cyan]"
+
+    # Combine the bars and the text
+    return f"{left_bar}{base_text}{right_bar}"
 
 def format_stats_line(player, total_length=69):
     # Define the encounter message with the placeholder for type
-    base_text = f"Floor: {player['floor']} | Level: {player['level']} | HP: {player['health']}/{player['max_health']} | Gold: {player['gold']} | Exp: {player['exp']} | Awareness: {player['awareness']}"
+    base_text = f"Floor: {player['floor']} | Level: {player['level']} | HP: {player['health']}/{player['max_health']} | Gold: {player['gold']} | Exp: {player['exp']}"
     
     # Calculate the length of padding needed on each side
     padding_needed = (total_length - len(base_text)) // 2

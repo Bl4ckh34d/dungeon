@@ -5,11 +5,11 @@ from vars import console
 
 def encounter_enemies(enemies):
     
-    from menus import use_item
+    from menus import use_item_screen
     from game import game_over
     from utils import (
         format_encounter_line,
-        format_battle_line,
+        format_status_bar,
         display_dungeon,
         is_adjacent
     )
@@ -23,7 +23,7 @@ def encounter_enemies(enemies):
         enemy_names = " and ".join([enemy.type['name'] for enemy in enemies])
     else:
         enemy_names = enemies[0].type['name']
-    console.print(format_encounter_line(enemy_names))
+    console.print(format_status_bar(vars.player['health'], vars.player['max_health'], vars.player['mana'], vars.player['max_mana']))
     console.print(vars.message['battle']['battle_sit_rep'].format(enemy=enemy_names))
     time.sleep(vars.settings["delay_enemy_encounter"])
     while enemies and vars.player['health'] > 0:
@@ -39,13 +39,13 @@ def encounter_enemies(enemies):
         else:
             enemy_names = enemies[0].type['name']
         display_dungeon()
-        console.print(vars.message["notification"]["player_action"])
+        console.print(format_status_bar(vars.player['health'], vars.player['max_health'], vars.player['mana'], vars.player['max_mana']))
         handle_status_effects()
         action = console.input(vars.message["notification"]["cursor"]).upper()
         time.sleep(vars.settings["delay_player_action"] / 2)
         if action == 'A':
             display_dungeon()
-            console.print(format_battle_line(enemy_names))
+            console.print(format_status_bar(vars.player['health'], vars.player['max_health'], vars.player['mana'], vars.player['max_mana']))
             if len(enemies) > 1:
                 console.print(vars.message["battle"]["choose_enemy"])
                 for idx, enemy in enumerate(enemies):
@@ -58,7 +58,7 @@ def encounter_enemies(enemies):
             else:
                 target_enemy = enemies[0]
             display_dungeon()
-            console.print(format_battle_line(enemy_names))
+            console.print(format_status_bar(vars.player['health'], vars.player['max_health'], vars.player['mana'], vars.player['max_mana']))
             weapon = vars.player['equipped']['weapon']
             weapon_attack = weapon['attack'] if weapon and 'attack' in weapon else 0
             damage_to_enemy = max(0, vars.player['attack'] + weapon_attack - target_enemy.defense + random.randint(-2, 2))
@@ -87,7 +87,7 @@ def encounter_enemies(enemies):
             display_dungeon()
         elif action == 'U':
             display_dungeon()
-            use_item()
+            use_item_screen()
         elif action == 'R':
             display_dungeon()
             success = attempt_run_away(enemy)
@@ -97,7 +97,7 @@ def encounter_enemies(enemies):
                 time.sleep(vars.settings["delay_flee_success"])
                 return
             else:
-                console.print(vars.message["notification"]["battle_line"])
+                console.print(format_status_bar(vars.player['health'], vars.player['max_health'], vars.player['mana'], vars.player['max_mana']))
                 console.print(vars.message["battle"]["flee_fail"])
                 time.sleep(vars.settings["delay_flee_success"])
                 # Enemies attack player
@@ -108,7 +108,12 @@ def encounter_enemies(enemies):
                         return
         else:
             display_dungeon()
-            console.print(vars.message["notification"]["battle_line"])
+            console.print(format_status_bar(vars.player['health'], vars.player['max_health'], vars.player['mana'], vars.player['max_mana']))
+            for enemy in enemies:
+                enemy_attack(enemy)
+                if vars.player['health'] <= 0:
+                    game_over()
+                    return
             time.sleep(vars.settings["delay_invalid_action"])
 
 def attempt_run_away(enemy):
@@ -127,8 +132,10 @@ def enemy_attack(enemy):
     if enemy.type['key'].lower() in ['c', 'h']:
         if random.random() < 0.2 and int(enemy.type['base_attack'] / vars.player['defense']) >= 1:
             #HP Transfer from Player to Enemy
-            vars.player['health'] - int(enemy.type['base_attack'] / (vars.player['defense'] * 1.5))
-            enemy.type['health'] + int(enemy.type['base_attack'] / (vars.player['defense'] * 1.5))
+            blood_amount = int(enemy.type['base_attack'] / (vars.player['defense'] * random.random(0.5, 1.5)))
+            vars.player['health'] - blood_amount
+            enemy.type['health'] + blood_amount
+            console.print(vars.message["battle"]["life_steal"].format(enemy=enemy.type['name'], damage=blood_amount))
     if enemy.type['key'].lower() in ['m', 'd']:
         if random.random() < 0.2:
             apply_status_effect(vars.player, 'burn')
@@ -147,7 +154,10 @@ def apply_status_effect(target, effect):
     
     def has_status_effect(target, effect):
         """Check if the target already has the status effect."""
-        return any(e['effect'] == effect for e in target['status_effects'])
+        if isinstance(target, Enemy):
+            return any(e['effect'] == effect for e in target.type['status_effects'])
+        else:
+            return any(e['effect'] == effect for e in target['status_effects'])
     
     if isinstance(target, Enemy):
         # Check if the enemy already has the effect
@@ -226,6 +236,9 @@ def apply_status_effect(target, effect):
         elif effect == 'heal':
             target['health'] = min(target['health'] + 10, target['max_health'])
             console.print(vars.message["status_effects"]["heal"])
+        elif effect == 'charge':
+            target['mana'] = min(target['mana'] + 10, target['max_mana'])
+            console.print(vars.message["status_effects"]["charge"])
         elif effect == 'cure_poison':
             target['status_effects'] = [e for e in target['status_effects'] if e['effect'] != 'poison']
             console.print(vars.message["status_effects"]["cure"])

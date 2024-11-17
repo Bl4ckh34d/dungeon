@@ -17,6 +17,7 @@ def update_player_stats():
     vars.player['wisdom'] = vars.player['base_wisdom'] + (accessory['wisdom'] if accessory else 0)
     vars.player['awareness'] = vars.player['base_awareness'] + (accessory['awareness'] if accessory else 0)
     vars.player['max_health'] = vars.player['base_max_health'] + (accessory['health'] if accessory else 0)
+    vars.player['max_mana'] = vars.player['base_max_mana'] + (accessory['mana'] if accessory else 0)
 
 def check_level_up():
     exp_needed = vars.player['level'] * 20
@@ -24,8 +25,11 @@ def check_level_up():
         vars.player['level'] += 1
         vars.player['exp'] -= exp_needed
         vars.player['base_max_health'] += 10 
+        vars.player['base_max_mana'] += 10 
         vars.player['max_health'] = vars.player['base_max_health']
+        vars.player['max_mana'] = vars.player['base_max_mana']
         vars.player['health'] = vars.player['base_max_health']
+        vars.player['mana'] = vars.player['base_max_mana']
         vars.player['base_attack'] += 2
         vars.player['base_defense'] += 2
         vars.player['base_agility'] += 1

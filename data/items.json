@@ -264,6 +264,13 @@
         "flavor_text": "A red potion that restores health when consumed."
     },
     {
+        "name": "Mana Potion",
+        "type": "potion",
+        "charge": 20,
+        "value": 20,
+        "flavor_text": "A blue potion that restores mana when consumed."
+    },
+    {
         "name": "Elixir of Life",
         "type": "potion",
         "heal": 50,

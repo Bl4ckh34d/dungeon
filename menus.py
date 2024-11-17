@@ -12,7 +12,7 @@ import os
 def show_menu():
     
     from player import check_level_up
-    
+    from game import stop_music
     
     while True:
         clear_screen()
@@ -127,11 +127,12 @@ def show_menu():
             save_game()
         elif choice == 'L':
             load_game()
-        elif choice == 'Q':
+        elif choice == 'E':
             confirm = console.input(vars.message["input"]["sure_quit"]).upper()
             if confirm == 'Y':
                 console.print*()
                 console.print(vars.message["game_over"]["thank_you"])
+                stop_music()
                 sys.exit()
             else:
                 continue
@@ -366,7 +367,7 @@ def delete_save():
 
     time.sleep(vars.settings["delay_delete_save"])
 
-def use_item():
+def use_item_screen():
     
     from projectiles import fire_ranged_weapon
     from battle import apply_status_effect
@@ -436,17 +437,21 @@ def use_item():
         console.print(table)
         console.print(vars.message["notification"]["use_item"])
         item = vars.player['inventory'][int(choice) - 1]
-        if item['type'] in ['weapon', 'armor', 'accessory']:
-            if not item.get('identified', True):
-                console.print(vars.message["notification"]["need_to_identify"])
-                time.sleep(vars.settings["delay_need_to_identify"])
-                use_item()
-        if item['type'] == 'potion':
+        
+        if not item.get('identified', True):
+            console.print(vars.message["notification"]["need_to_identify"])
+            time.sleep(vars.settings["delay_need_to_identify"])
+            use_item_screen()
+        if item['type'] in ['potion', 'tool', 'scroll']:
             if 'heal' in item:
                 vars.player['health'] = min(vars.player['max_health'], vars.player['health'] + item['heal'])
                 console.print(vars.message["notification"]["recovered_hp"].format(item=item['heal']))
+            if 'charge' in item:
+                vars.player['mana'] = min(vars.player['max_mana'], vars.player['mana'] + item['charge'])
+                console.print(vars.message["notification"]["recovered_mp"].format(item=item['charge']))
             if 'effect' in item:
                 apply_status_effect(vars.player, item['effect'])
+                use_item_screen()
             vars.player['inventory'].pop(int(choice) - 1)
         elif item['type'] == 'weapon' and item.get('range', False):
             fire_ranged_weapon(item)
@@ -456,9 +461,9 @@ def use_item():
         else:
             console.print(vars.message["notification"]["cannot_use_item"])
             time.sleep(vars.settings["delay_cannot_use"])
-            use_item()
+            use_item_screen()
     else:
-        use_item()
+        use_item_screen()
 
 def show_item_details(item):
     clear_screen()
@@ -818,17 +823,23 @@ def show_inventory():
                     console.print(vars.message["notification"]["show_inventory_control_line"])
                     action = console.input(vars.message["notification"]["cursor"]).upper()
                     if action == 'E':
-                        if not item.get('identified', True):
-                            console.print("You need to identify this item before equipping it.")
-                            time.sleep(vars.settings["delay_need_to_identify"])
-                        else:
-                            equip_item(item)
+                        if item["type"] in ['armor', 'weapon', 'accessory']:
+                            if not item.get('identified', True):
+                                console.print("You need to identify this item before you can equip it.")
+                                time.sleep(vars.settings["delay_need_to_identify"])
+                            else:
+                                equip_item(item)
+                        elif item["type"] in ['scroll', 'potion', 'tool']:
+                            console.print("You cannot equip this item. You should use it instead.")
+                            
                     elif action == 'U':
-                        if not item.get('identified', True):
-                            console.print("You need to identify this item before using it.")
+                        if item["type"] in ['armor', 'weapon', 'accessory']:
+                            console.print("You cannot use this item. You should equip it instead.")
                             time.sleep(vars.settings["delay_need_to_identify"])
-                        else:
+                        elif item["type"] in ['scroll', 'potion', 'tool']:
                             use_specific_item(item)
+                        else:
+                            console.print("You cannot use this item. You should sell it in a shop.")
                     elif action == '':
                         continue
                     else:

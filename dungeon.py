@@ -86,29 +86,15 @@ class BSPNode:
         # Define room position within the padded area
         room_x = random.randint(self.x + padding, self.x + self.width - room_width - padding)
         room_y = random.randint(self.y + padding, self.y + self.height - room_height - padding)
-
-        # Decide if this room should be a secret room
-        is_secret_room = random.random() < vars.settings["secret_room_chance"]
         
+        # Create regular room - never secret during BSP phase
         room = {
             'x': room_x,
             'y': room_y,
             'width': room_width,
             'height': room_height,
-            'is_secret': is_secret_room
+            'is_secret': False  # Always False during initial room creation
         }
-
-        # If it's a secret room, add it to the secret_rooms list
-        if is_secret_room:
-            vars.secret_rooms.append(room)
-        else:
-            vars.rooms.append(room)
-
-        # Temporarily visualize the room as dark grey if in visualization mode
-        if visualizing:
-            create_room(room, visualizing=vars.settings["debug"])
-        else:
-            create_room(room)
 
         # Store the room in the node
         self.room = room
@@ -133,22 +119,22 @@ def generate_dungeon(player):
     vars.rooms = []
     vars.secret_rooms = []
     vars.items_on_floor = {}
-    vars.player['shops_visited'] = set()  # Reset shops visited on new floor
+    vars.player['shops_visited'] = set()
 
     # Carve out rooms and corridors
     make_map(visualize_split=vars.settings["debug"])
 
-    # Place player in the first room
-    first_room = vars.rooms[0]
+    # Place player in the first regular (non-secret) room
+    first_room = vars.rooms[0]  # vars.rooms only contains regular rooms now
     player['pos'] = [first_room['y'] + first_room['height'] // 2, first_room['x'] + first_room['width'] // 2]
 
-    # Place exit in the last room
-    last_room = vars.rooms[-1]
+    # Place exit in the last regular room
+    last_room = vars.rooms[-1]  # vars.rooms only contains regular rooms
     exit_x = last_room['x'] + last_room['width'] // 2
     exit_y = last_room['y'] + last_room['height'] // 2
     vars.dungeon[exit_y][exit_x] = vars.graphic["exit_char"]
 
-    # Adjust item and enemy counts based on floor
+    # Rest of the function remains the same...
     floor_multiplier = player['floor']
     max_floor = 10
     if player['floor'] == max_floor:
@@ -160,7 +146,6 @@ def generate_dungeon(player):
         num_items = max(2, 5 - floor_multiplier)
         num_enemies = min(10 + floor_multiplier * 2, 30)
 
-    # Place treasures, items, enemies, and shops
     place_random_items(vars.graphic["treasure_char"], num_treasures, rare=True)
     place_random_items(vars.graphic["item_char"], num_items, rare=True)
     place_enemies(num_enemies)
@@ -168,6 +153,9 @@ def generate_dungeon(player):
         place_shop()
         
 def make_map(visualize_split=vars.settings["debug"]):
+    # Clear any existing secret rooms at the start
+    vars.secret_rooms = []
+    
     root = BSPNode(0, 0, vars.settings["dungeon_width"], vars.settings["dungeon_height"])
     nodes = [root]
     min_size = vars.settings["min_room_size"]
@@ -190,7 +178,7 @@ def make_map(visualize_split=vars.settings["debug"]):
                 print_dungeon_ascii(vars.dungeon, nodes, title="BSP Splitting in Progress")
                 input("Press Enter to proceed...")
 
-    # Create rooms
+    # Create regular rooms first - these are never secret
     rooms = []
     leaf_nodes = [node for node in get_all_leaves(root)]
     for i, node in enumerate(leaf_nodes):
@@ -202,51 +190,96 @@ def make_map(visualize_split=vars.settings["debug"]):
                 print_dungeon_ascii(vars.dungeon, title=f"Room {i+1} Placement")
                 input("Press Enter to proceed...")
 
-    # Maybe add a single secret room
-    if random.random() < vars.settings["secret_room_chance"]:
-        create_single_secret_room(rooms)
-
     if visualize_split:
         print_dungeon_ascii(vars.dungeon, title="Final Room Layout Before Hallways")
         input("Press Enter to proceed...")
 
-    # Connect rooms efficiently
+    # Connect regular rooms first
     connect_all_rooms(rooms)
+    
+    # Maybe add a secret room, but only after all regular rooms are connected
+    if random.random() < vars.settings["secret_room_chance"]:
+        create_single_secret_room(rooms)
 
     vars.rooms = rooms
 
+
 def create_single_secret_room(existing_rooms):
-    """Create a single secret room and connect it to the nearest suitable room."""
+    """Create a single secret room as a dead end."""
     attempts = 0
     while attempts < 100:
+        # Make secret rooms slightly smaller than regular rooms
         w = random.randint(4, 6)
         h = random.randint(4, 6)
         x = random.randint(1, vars.settings["dungeon_width"] - w - 2)
         y = random.randint(1, vars.settings["dungeon_height"] - h - 2)
 
-        secret_room = {'x': x, 'y': y, 'width': w, 'height': h, 'is_secret': True}
+        secret_room = {
+            'x': x,
+            'y': y,
+            'width': w,
+            'height': h,
+            'is_secret': True  # Explicitly mark as secret
+        }
 
-        # Check for overlap with existing rooms
-        if any(rooms_overlap(secret_room, other_room) for other_room in existing_rooms + vars.secret_rooms):
+        # Check for overlap with existing rooms and their connecting corridors
+        # Add some padding to avoid being too close
+        padding = 2
+        expanded_secret_room = {
+            'x': x - padding,
+            'y': y - padding,
+            'width': w + (padding * 2),
+            'height': h + (padding * 2)
+        }
+        
+        if any(rooms_overlap(expanded_secret_room, other_room) for other_room in existing_rooms):
             attempts += 1
             continue
 
-        # Create the secret room
-        create_secret_room(secret_room)
+        # Instead of using a dictionary with room objects as keys,
+        # we'll create a list of rooms with their connection counts
+        room_connections = []
+        for room in existing_rooms:
+            connections = 0
+            for other_room in existing_rooms:
+                if room != other_room and not path_intersects_rooms(room, other_room, existing_rooms):
+                    connections += 1
+            room_connections.append((room, connections))
 
-        # Find the nearest regular room
-        nearest_room = find_nearest_room(secret_room, existing_rooms)
+        # Filter for rooms that could be good connection points
+        potential_connections = [
+            room for room, connections in room_connections 
+            if connections <= 1  # Only connect to rooms with 0 or 1 existing connections
+        ]
+
+        if not potential_connections:
+            attempts += 1
+            continue
+
+        # Sort potential connections by distance
+        potential_connections.sort(key=lambda room: manhattan_distance(secret_room, room))
         
-        # Connect to the nearest room
-        connect_secret_room(secret_room, nearest_room)
+        # Try to connect to the nearest suitable room
+        connected = False
+        for target_room in potential_connections:
+            # Check if we can create a path without intersecting other rooms
+            if not path_intersects_rooms(secret_room, target_room, existing_rooms):
+                # Create the secret room
+                create_room(secret_room)
+                # Connect it
+                connect_secret_room(secret_room, target_room)
+                # Place items and enemies
+                place_strong_enemy(secret_room)
+                place_secret_room_items(secret_room)
+                # Store as the only secret room
+                vars.secret_rooms = [secret_room]
+                connected = True
+                break
 
-        # Place items and enemies
-        place_strong_enemy(secret_room)
-        place_secret_room_items(secret_room)
+        if connected:
+            break
 
-        # Clear existing secret rooms (should be empty anyway) and add this one
-        vars.secret_rooms = [secret_room]
-        break
+        attempts += 1
 
 def find_nearest_room(target_room, rooms):
     """Find the nearest regular room to the target room."""
@@ -428,14 +461,14 @@ def rooms_overlap(room1, room2):
             room1['y'] <= room2['y'] + room2['height'] - 1 and
             room1['y'] + room1['height'] - 1 >= room2['y'])
 
-def create_room(room, visualizing=False):
+def create_room(room, visualizing=vars.settings['debug']):
     """Carve out a room in the dungeon."""
     for x in range(room['x'], room['x'] + room['width']):
         for y in range(room['y'], room['y'] + room['height']):
-            if room.get('is_secret') and visualizing:
+            if room.get('is_secret', False) and visualizing:
                 # Display secret rooms in dark grey temporarily
                 vars.dungeon[y][x] = "[#222222]█[/]"
-            elif room.get('is_secret'):
+            elif room.get('is_secret', False):
                 # During gameplay, secret rooms are rendered as walls
                 vars.dungeon[y][x] = vars.graphic["wall_char"]
             else:

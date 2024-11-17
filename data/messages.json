@@ -97,7 +97,8 @@
         "enemy_effect": "Enemy is affected by {effect}!",
         "shoot_projectile": "You fire a projectile towards the enemy!",
         "battle_sit_rep": "You're crossing blades with a vicious {enemy}!",
-        "choose_enemy": " Choose an enemy to attack: "
+        "choose_enemy": " Choose an enemy to attack: ",
+        "life_steal": "{enemy} steals [bold red]{damage} health[/bold red] from you!"
     },
     "warning": {
         "unknown_enemy_type": "Unknown enemy type: {type}. Skipping.",
@@ -142,11 +143,12 @@
         "found_item": "You found a [bold cyan]{item}[/bold cyan]!",
         "need_to_identify": "You need to identify this item before using it.",
         "recovered_hp": "You recovered {item} health!",
+        "recovered_hm": "You recharged {item} mana!",
         "show_inventory_control_line": "============| ([bright_cyan]E[/bright_cyan])quip Item · ([bright_cyan]U[/bright_cyan])se Item · [bright_cyan]Return[/bright_cyan]: Cancel |============",
         "sell_inventory_control_line": "==================| [bright_cyan]#[/bright_cyan]: Sell Item · [bright_cyan]Return[/bright_cyan]: Cancel |==================",
         "shop_control_line": "===| [bright_cyan]#[/bright_cyan]: [bright_cyan]Buy[/bright_cyan] Item · ([bright_cyan]S[/bright_cyan])ell Item · ([bright_cyan]I[/bright_cyan])dentify Item · [bright_cyan]Return[/bright_cyan]: Cancel |===",
         "menu_control_line": "=============| ([bright_cyan]S[/bright_cyan])ave Game · ([bright_cyan]L[/bright_cyan])oad Game · ([bright_cyan]E[/bright_cyan])xit Game |==============",
-        "player_action": "================| ([bold red]A[/bold red])ttack · ([bold red]U[/bold red])se Item · ([bold red]R[/bold red])un Away |================",
+        "player_action": "| ([bold red]A[/bold red])ttack · ([bold red]U[/bold red])se Item · ([bold red]R[/bold red])un Away |",
         "===": "======================================================================",
         "battle_line": "============================== [bold red]Battle![/bold red] ===============================",
         "escape_line": "============================== [bold red]Escape![/bold red] ===============================",
