@@ -154,3 +154,6 @@ def room_contains_tile(room, tile):
     """Check if a tile is within the bounds of a room."""
     return room['x'] <= tile[1] < room['x'] + room['width'] and \
            room['y'] <= tile[0] < room['y'] + room['height']
+           
+def is_adjacent(pos1, pos2):
+    return max(abs(pos1[0] - pos2[0]), abs(pos1[1] - pos2[1])) == 1

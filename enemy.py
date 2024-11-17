@@ -7,23 +7,24 @@ from vars import console
 # Enemy class
 class Enemy:
     def __init__(self, enemy_type, y, x):
+        self.rand = random.randint(-vars.player['level'], vars.player['level'])
         self.type = enemy_type
-        self.health = enemy_type['base_health'] + random.randint(-2, 2)
+        self.health = enemy_type['base_max_health'] + self.rand * 2
         self.max_health = self.health
-        self.attack = enemy_type['base_attack'] + random.randint(-1, 1)
-        self.defense = enemy_type['base_defense'] + random.randint(-1, 1)
+        self.attack = enemy_type['base_attack'] + self.rand * 2
+        self.defense = enemy_type['base_defense'] + self.rand * 2
         self.pos = [y, x]
         self.symbol = enemy_type['symbol']
         self.status_effects = []
         self.exp = self.health + self.attack + self.defense
-        self.gold = random.randint(5, 15)
+        self.gold = self.rand * random.randint(1,15)
         self.loot_type = enemy_type['loot']
         self.weapon = assign_enemy_weapon(enemy_type)
         self.movement_cooldown = enemy_type.get('movement_cooldown', 1)
-        self.turns_since_move = 0  # For enemies like Zombies
+        self.turns_since_move = 0
         self.shooting_cooldown = enemy_type.get('shooting_cooldown', 1)
         self.turns_since_shot = 0
-        self.id = str(uuid.uuid4())  # Unique identifier for serialization
+        self.id = str(uuid.uuid4())
 
     def move(self, player_pos):
         # Handle movement cooldown for slow enemies like Zombies

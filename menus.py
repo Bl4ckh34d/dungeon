@@ -80,9 +80,6 @@ def show_menu():
             gold,
             exp,
             "",
-            equipped_weapon,
-            equipped_armor,
-            equipped_accessory,
             status_title,
             *status_fields,
             enemies_killed,
@@ -92,8 +89,8 @@ def show_menu():
             items_purchased 
         ]
 
-        first_column = element_array[:15]
-        second_column = element_array[15:]
+        first_column = element_array[:12]
+        second_column = element_array[12:]
 
         # Create a table with two columns
         table = Table(show_header=False, box=None, show_lines=False, expand=False, padding=(0, 1))
@@ -103,7 +100,7 @@ def show_menu():
         table.add_column("Second Column", width=int(vars.settings["dungeon_width"] / 2 ))
 
         # Calculate the number of rows needed based on the minimum
-        rows = max(vars.settings["min_rows"], len(first_column), len(second_column))
+        rows = max(vars.settings["min_rows"] - 4, len(first_column), len(second_column))
 
         # Add rows to the table, including padding if necessary
         for row in range(rows):
@@ -113,9 +110,15 @@ def show_menu():
             
             # Add a row to the table
             table.add_row(first_item, second_item)
+        
+        
 
         # Print the table (assumes you have a console object)
         console.print(table)
+        console.print(equipped_weapon)
+        console.print(equipped_armor)
+        console.print(equipped_accessory)
+        console.print()
         console.print(vars.message["notification"]["menu_control_line"])
 
         # Input handling code
@@ -599,7 +602,7 @@ def sell_items():
             console.input(vars.message["notification"]["cursor"]).upper()
             break
         
-def identify_service():
+def identify_service(buffer):
     unidentified_items = [item for item in vars.player['inventory'] if not item.get('identified', True)]
     if not unidentified_items:
         console.print("You have no unidentified items.")
@@ -631,9 +634,14 @@ def identify_service():
         else:
             console.print("You don't have enough gold!")
         time.sleep(vars.settings["delay_not_enough_gold"])
+        clear_screen()
+        console.print(buffer)
+        identify_service(buffer)
     else:
         console.print(vars.message["warning"]["invalid_choice"])
         time.sleep(vars.settings["delay_invalid_choice"])
+        console.print(buffer)
+        identify_service(buffer)
         
 # Enter shop
 def enter_shop(shop_position):    
@@ -707,7 +715,8 @@ def enter_shop(shop_position):
             console.print(f" You have [bold yellow]{vars.player['gold']} gold[/bold yellow].")
             console.print()
             console.print(vars.message["notification"]["==="])
-            identify_service()
+            buffer2 = f"{buffer}\n{table}\n\n You have [bold yellow]{vars.player['gold']} gold[/bold yellow].\n\n{vars.message['notification']['===']}"
+            identify_service(buffer2)
         elif choice.isdigit() and 1 <= int(choice) <= len(shop_items):
             # Buy item directly if a valid number is entered
             idx = int(choice) - 1
@@ -814,7 +823,6 @@ def show_inventory():
                             time.sleep(vars.settings["delay_need_to_identify"])
                         else:
                             equip_item(item)
-                            vars.player['inventory'].pop(idx)
                     elif action == 'U':
                         if not item.get('identified', True):
                             console.print("You need to identify this item before using it.")

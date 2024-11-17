@@ -227,7 +227,7 @@ def place_strong_enemy(room):
 def select_strong_enemy_type():
     """Select a strong enemy type based on the floor level."""
     floor = vars.player['floor']
-    suitable_enemies = [et for et in vars.enemy_types_list if et['base_health'] >= 15 + floor * 2]
+    suitable_enemies = [et for et in vars.enemy_types_list if et['base_max_health'] >= 15 + floor * 2]
     if not suitable_enemies:
         suitable_enemies = vars.enemy_types_list  # Default to all enemies if no suitable ones are found
     return random.choice(suitable_enemies)
@@ -341,11 +341,11 @@ def select_enemy_type():
     floor = vars.player['floor']
     # Filter enemies based on floor
     if floor == 1:
-        weak_enemies = [et for et in vars.enemy_types_list if et['base_health'] <= 10]
+        weak_enemies = [et for et in vars.enemy_types_list if et['base_max_health'] <= 10]
         return random.choice(weak_enemies)
     else:
         # Increase enemy strength with floor
-        suitable_enemies = [et for et in vars.enemy_types_list if et['base_health'] <= 10 + floor * 5]
+        suitable_enemies = [et for et in vars.enemy_types_list if et['base_max_health'] <= 10 + floor * 5]
         return random.choice(suitable_enemies)
 
 def place_shop():

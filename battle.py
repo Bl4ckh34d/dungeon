@@ -3,59 +3,89 @@ import random
 import vars
 from vars import console
 
-
-def encounter_enemy(enemy):
+def encounter_enemies(enemies):
     
     from menus import use_item
     from game import game_over
     from utils import (
         format_encounter_line,
         format_battle_line,
-        display_dungeon
+        display_dungeon,
+        is_adjacent
     )
     from player import check_level_up
+    from enemy import Enemy
     
     display_dungeon()
-    console.print(format_encounter_line(enemy.type['name']))
-    console.print(vars.message['battle']['battle_sit_rep'].format(enemy=enemy.type['name']))
+    if len(enemies) > 2:
+        enemy_names = ", ".join([enemy.type['name'] for enemy in enemies[:-1]]) + ", and " + enemies[-1].type['name']
+    elif len(enemies) == 2:
+        enemy_names = " and ".join([enemy.type['name'] for enemy in enemies])
+    else:
+        enemy_names = enemies[0].type['name']
+    console.print(format_encounter_line(enemy_names))
+    console.print(vars.message['battle']['battle_sit_rep'].format(enemy=enemy_names))
     time.sleep(vars.settings["delay_enemy_encounter"])
-    while enemy.health > 0 and vars.player['health'] > 0:
+    while enemies and vars.player['health'] > 0:
+        for enemy in vars.enemies:
+            enemy.move(vars.player['pos'])
+        adjacent_enemies = [enemy for enemy in vars.enemies if is_adjacent(enemy.pos, vars.player['pos'])]
+        if adjacent_enemies:
+            enemies = adjacent_enemies
         display_dungeon()
         console.print(vars.message["notification"]["player_action"])
         handle_status_effects()
         action = console.input(vars.message["notification"]["cursor"]).upper()
-        #time.sleep(vars.settings["delay_player_action"])
+        # time.sleep(vars.settings["delay_player_action"])
         if action == 'A':
             display_dungeon()
-            console.print(format_battle_line(enemy.type['name']))
+            console.print(format_battle_line(enemy_names))
+
+            # Player chooses which enemy to attack
+            if len(enemies) > 1:
+                console.print(vars.message["battle"]["choose_enemy"])
+                for idx, enemy in enumerate(enemies):
+                    console.print(f"{idx + 1}. {enemy.type['name']} (HP: {enemy.health}/{enemy.max_health})")
+                choice = console.input(vars.message["notification"]["cursor"]).strip()
+                if not choice.isdigit() or not (1 <= int(choice) <= len(enemies)):
+                    target_enemy = enemies[0]
+                else:
+                    target_enemy = enemies[int(choice) - 1]
+            else:
+                target_enemy = enemies[0]
+
             weapon = vars.player['equipped']['weapon']
             weapon_attack = weapon['attack'] if weapon and 'attack' in weapon else 0
-            damage_to_enemy = max(0, vars.player['attack'] + weapon_attack - enemy.defense + random.randint(-2, 2))
-            enemy.health -= damage_to_enemy
-            console.print(vars.message["battle"]["enemy_hit_by_player"].format(damage=damage_to_enemy, type=enemy.type['name']))
-            if weapon and 'effect' in weapon:
-                apply_status_effect(enemy, weapon['effect'])
-            if enemy.health <= 0:
-                #time.sleep(vars.settings["delay_enemy_defeated"] / 3)
-                console.print(vars.message["battle"]["enemy_defeated"].format(type=enemy.type['name']))
+            damage_to_enemy = max(0, vars.player['attack'] + weapon_attack - target_enemy.defense + random.randint(-2, 2))
+            target_enemy.health -= damage_to_enemy
+            console.print(vars.message["battle"]["enemy_hit_by_player"].format(damage=damage_to_enemy, type=target_enemy.type['name']))
+            if weapon and 'effect' in weapon and random.random() < 0.2:
+                apply_status_effect(target_enemy, weapon['effect'])
+            if target_enemy.health <= 0:
+                # time.sleep(vars.settings["delay_enemy_defeated"] / 3)
+                console.print(vars.message["battle"]["enemy_defeated"].format(type=target_enemy.type['name']))
                 time.sleep(vars.settings["delay_enemy_defeated"])
-                vars.player['exp'] += enemy.exp
+                vars.player['exp'] += target_enemy.exp
                 # Handle loot drops based on enemy type
-                handle_loot(enemy)
+                handle_loot(target_enemy)
                 check_level_up()
-                break
-            # Enemy attacks player
-            enemy_attack(enemy)
-            if vars.player['health'] <= 0:
-                game_over()
-                return
+                enemies.remove(target_enemy)
+                vars.enemies.remove(target_enemy)  # Remove from global enemies list
+                if not enemies:
+                    break
+            # Enemies attack player
+            for enemy in enemies:
+                enemy_attack(enemy)
+                if vars.player['health'] <= 0:
+                    game_over()
+                    return
             display_dungeon()
         elif action == 'U':
             display_dungeon()
             use_item()
         elif action == 'R':
             display_dungeon()
-            success = attempt_run_away()
+            success = attempt_run_away(enemy)
             if success:
                 console.print(vars.message["notification"]["escape_line"])
                 console.print(vars.message["battle"]["ran_away"])
@@ -65,28 +95,44 @@ def encounter_enemy(enemy):
                 console.print(vars.message["notification"]["battle_line"])
                 console.print(vars.message["battle"]["flee_fail"])
                 time.sleep(vars.settings["delay_flee_success"])
-                enemy_attack(enemy)
-                if vars.player['health'] <= 0:
-                    game_over()
-                    return
+                # Enemies attack player
+                for enemy in enemies:
+                    enemy_attack(enemy)
+                    if vars.player['health'] <= 0:
+                        game_over()
+                        return
         else:
             display_dungeon()
             console.print(vars.message["notification"]["battle_line"])
             time.sleep(vars.settings["delay_invalid_action"])
 
-def attempt_run_away():
-    # Run away success based on player's agility
-    run_chance = vars.player['agility'] / 10  # Example: agility 5 -> 50% chance
+def attempt_run_away(enemy):
+    run_chance = max(0.1, (vars.player['agility'] - enemy['base_agility']) / 10)
     return random.random() < run_chance
 
 def enemy_attack(enemy):
     damage_to_player = max(0, enemy.attack - vars.player['defense'] + random.randint(-2, 2))
     vars.player['health'] -= damage_to_player
-    #time.sleep(vars.settings["delay_enemy_attack"])
+    # time.sleep(vars.settings["delay_enemy_attack"])
     console.print(vars.message["battle"]["player_hit_by_enemy"].format(type=enemy.type['name'], damage=damage_to_player))
     # Chance to apply poison effect
-    if random.random() < 0.2 and enemy.type['name'].lower() not in ['mage', 'dragon']:
-        apply_status_effect(vars.player, 'poison')
+    if enemy.type['key'].lower() in ['r', 'b', 'k', 'g']:
+        if random.random() < 0.2:
+            apply_status_effect(vars.player, 'poison')
+    if enemy.type['key'].lower() in ['c', 'h']:
+        if random.random() < 0.2 and int(enemy.type['base_attack'] / vars.player['defense']) >= 1:
+            #HP Transfer from Player to Enemy
+            vars.player['health'] - int(enemy.type['base_attack'] / (vars.player['defense'] * 1.5))
+            enemy.type['health'] + int(enemy.type['base_attack'] / (vars.player['defense'] * 1.5))
+    if enemy.type['key'].lower() in ['m', 'd']:
+        if random.random() < 0.2:
+            apply_status_effect(vars.player, 'burn')
+    if enemy.type['key'].lower() in ['m']:
+        if random.random() < 0.2:
+            apply_status_effect(vars.player, 'freeze')
+    if enemy.type['key'].lower() in ['m']:
+        if random.random() < 0.2:
+            apply_status_effect(vars.player, 'shock')
     time.sleep(vars.settings["delay_enemy_attack"])
 
 def apply_status_effect(target, effect):

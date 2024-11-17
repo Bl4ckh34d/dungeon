@@ -41,7 +41,7 @@ def check_level_up():
 def move_player(direction):
     
     from menus import enter_shop
-    from battle import encounter_enemy
+    from battle import encounter_enemies
     from dungeon import (
         reveal_secret_room,
         generate_dungeon,
@@ -50,14 +50,15 @@ def move_player(direction):
         find_item,
         find_treasure
     )
+    from utils import is_adjacent
         
     new_y = vars.player['pos'][0] + vars.directions[direction][0]
     new_x = vars.player['pos'][1] + vars.directions[direction][1]
     if 0 <= new_y < vars.settings["dungeon_height"] and 0 <= new_x < vars.settings["dungeon_width"]:
         cell = vars.dungeon[new_y][new_x]
-        enemy_here = next((e for e in vars.enemies if e.pos == [new_y, new_x]), None)
-        if enemy_here:
-            encounter_enemy(enemy_here)
+        adjacent_enemies = [enemy for enemy in vars.enemies if is_adjacent(enemy.pos, vars.player['pos'])]
+        if len(adjacent_enemies) > 0:
+            encounter_enemies(adjacent_enemies)
         elif cell == vars.graphic["wall_char"]:
             console.print(vars.message["notification"]["wall_bump"])
         elif cell == vars.graphic["secret_door_char"]:
@@ -75,15 +76,17 @@ def move_player(direction):
             elif cell == vars.graphic["exit_char"]:
                 if vars.player['floor'] == 10:
                     console.print(random.choice(vars.message["ending"]["game_finished"]))
+                    vars.player['pos'] = [new_y, new_x]
                     sys.exit()
                 else:
                     console.print(vars.message["notification"]["exit_found"])
                     vars.player['floor'] += 1
-                    generate_dungeon()
+                    generate_dungeon(vars.player)
                     return
             elif cell == vars.graphic["shop_char"]:
                 enter_shop((new_y, new_x))
-            vars.player['pos'] = [new_y, new_x]
+            else:
+                vars.player['pos'] = [new_y, new_x]
 
 def within_awareness(tile):
     """Check if a tile is within the player's awareness range."""

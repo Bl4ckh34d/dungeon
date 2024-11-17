@@ -44,13 +44,13 @@ def main_game_loop():
         apply_status_effect,
         handle_loot,
         handle_status_effects,
-        encounter_enemy
+        encounter_enemies
     )
     from menus import (
         show_menu,
         show_inventory
     )
-    from utils import display_dungeon
+    from utils import display_dungeon, is_adjacent
     from player import move_player, check_level_up
     from dungeon import generate_dungeon
     
@@ -75,6 +75,13 @@ def main_game_loop():
         # Enemies take their turn
         for enemy in vars.enemies:
             enemy.move(vars.player['pos'])
+        # Enemies attack player if adjacent
+        adjacent_enemies = [enemy for enemy in vars.enemies if is_adjacent(enemy.pos, vars.player['pos'])]
+        if adjacent_enemies:
+            encounter_enemies(adjacent_enemies)
+            if vars.player['health'] <= 0:
+                game_over()
+                return
 
         # Move projectiles
         for projectile in vars.projectiles[:]:
@@ -128,7 +135,7 @@ def main_game_loop():
         # Check for enemy at player's position
         enemy_at_player = next((e for e in vars.enemies if e.pos == vars.player['pos']), None)
         if enemy_at_player:
-            encounter_enemy(enemy_at_player)
+            encounter_enemies([enemy_at_player])
             if enemy_at_player.health <= 0:
                 vars.enemies.remove(enemy_at_player)
 

@@ -96,7 +96,8 @@
         "enemy_weak": "The {type} is especially [bold #f9a596]vulnerable[bold #f9a596] to {effect}!",
         "enemy_effect": "Enemy is affected by {effect}!",
         "shoot_projectile": "You fire a projectile towards the enemy!",
-        "battle_sit_rep": "You're crossing blades with a vicious {enemy}!"
+        "battle_sit_rep": "You're crossing blades with a vicious {enemy}!",
+        "choose_enemy": " Choose an enemy to attack: "
     },
     "warning": {
         "unknown_enemy_type": "Unknown enemy type: {type}. Skipping.",
