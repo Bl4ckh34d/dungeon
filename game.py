@@ -6,6 +6,7 @@ import random
 import vars
 import time
 import sys
+import json
 
 # Helper function to stop FFmpeg
 def stop_music():
@@ -68,19 +69,46 @@ def main_game_loop():
     while vars.player['health'] > 0:
         display_dungeon()
         console.print(vars.message["ui"]['bottom_lines']['instructions']["play_options"])
-        move = console.input(vars.message["input"]["cursor"]).upper()
-        if move == "W":
-            move_player("N")
-        elif move == "S":
-            move_player("S")
-        elif move == "A":
-            move_player("W")
-        elif move == "D":
-            move_player("E")
-        elif move == "I":
-            show_inventory()
-        elif move == "M":
-            show_menu()
+        move = console.input(vars.message["input"]["cursor"]).lower()
+        
+        # Handle multi-step movement
+        i = 0
+        while i < len(move):
+            current_move = move[i:i+2] if i+1 < len(move) else move[i]
+            
+            # Handle diagonal movement
+            if len(current_move) == 2:
+                if current_move in ['wa', 'aw']:
+                    move_player("NW")
+                    i += 2
+                elif current_move in ['wd', 'dw']:
+                    move_player("NE")
+                    i += 2
+                elif current_move in ['sa', 'as']:
+                    move_player("SW")
+                    i += 2
+                elif current_move in ['sd', 'ds']:
+                    move_player("SE")
+                    i += 2
+                else:
+                    # If not a valid diagonal move, process first character only
+                    current_move = move[i]
+                    i += 1
+            else:
+                i += 1
+                # Handle regular movement
+                if current_move == "w":
+                    move_player("N")
+                elif current_move == "s":
+                    move_player("S")
+                elif current_move == "a":
+                    move_player("W")
+                elif current_move == "d":
+                    move_player("E")
+                elif current_move == "i":
+                    show_inventory()
+                elif current_move == "m":
+                    show_menu()
 
         # Enemies take their turn
         for enemy in vars.enemies:

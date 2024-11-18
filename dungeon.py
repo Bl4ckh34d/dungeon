@@ -626,6 +626,35 @@ def create_v_tunnel(y1, y2, x, is_secret=False, visualizing=False, visualized_ti
         else:
             vars.dungeon[y][x] = vars.graphic["wall_char"] if is_secret else vars.graphic["floor_char"]
 
+def get_available_items(floor_level, item_types=None):
+    """
+    Get items available for the current floor level.
+    Higher rarity items become available on higher floors.
+    
+    Floor 1-3: Common items (rarity 1-2)
+    Floor 4-6: Uncommon items (rarity 1-3)
+    Floor 7-8: Rare items (rarity 1-4)
+    Floor 9-10: All items (rarity 1-5)
+    """
+    max_rarity = 1
+    if floor_level <= 3:
+        max_rarity = 2
+    elif floor_level <= 6:
+        max_rarity = 3
+    elif floor_level <= 8:
+        max_rarity = 4
+    else:
+        max_rarity = 5
+
+    # Filter items by rarity and type
+    available_items = [
+        item for item in vars.items 
+        if item.get('rarity', 1) <= max_rarity and
+        (item_types is None or item['type'] in item_types)
+    ]
+    
+    return available_items
+
 def place_random_items(symbol, count, rare=False):
     for _ in range(count):
         attempts = 0
@@ -634,11 +663,16 @@ def place_random_items(symbol, count, rare=False):
             y = random.randint(1, vars.settings["dungeon_height"] - 2)
             if vars.dungeon[y][x] == vars.graphic["floor_char"] and [y, x] != vars.player['pos']:
                 if symbol == vars.graphic["item_char"]:
-                    if rare and random.random() < 0.1:
-                        item = random.choice([item for item in vars.items if item['type'] in ['weapon', 'armor', 'accessory']])
+                    if rare and random.random() < 0.1 + (vars.player['floor'] * 0.02):  # Increased chance on higher floors
+                        # Get equipment items appropriate for the current floor
+                        available_items = get_available_items(vars.player['floor'], ['weapon', 'armor', 'accessory'])
+                        if available_items:
+                            item = random.choice(available_items)
                     else:
-                        # Exclude 'Scroll of Identify' from random selection
-                        item = random.choice([item for item in vars.items if item['type'] not in ['weapon', 'armor', 'accessory', 'scroll']])
+                        # Get consumable items appropriate for the current floor
+                        available_items = get_available_items(vars.player['floor'], ['potion', 'scroll'])
+                        if available_items:
+                            item = random.choice(available_items)
                     vars.dungeon[y][x] = vars.graphic["item_char"]
                     vars.items_on_floor[(y, x)] = item  # Store the item in the items_on_floor dictionary
                 else:
@@ -665,6 +699,7 @@ def place_enemies(num_enemies):
             attempts += 1
 
 def select_enemy_type():
+    """Select a strong enemy type based on the floor level."""
     floor = vars.player['floor']
     # Filter enemies based on floor
     if floor == 1:

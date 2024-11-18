@@ -1,4 +1,3 @@
-
 from utils import display_dungeon
 from vars import console
 import random
@@ -6,14 +5,44 @@ import time
 import vars
 
 def find_treasure():
+    from dungeon import get_available_items
+    
     display_dungeon()
     console.print(vars.message["ui"]['bottom_lines']['instructions']["play_options"])
-    loot = random.choice([item for item in vars.items if item['type'] == 'money'])
-    amount = loot['amount'] + random.randint(-5, 5)
-    amount = max(1, amount)  # Ensure at least 1 gold
-    vars.player['gold'] += amount
-    vars.player['gold_collected'] += amount
-    console.print(vars.message["notification"]["found_loot"].format(loot=loot['name'], amount=amount))
+    
+    # Get treasure items appropriate for the current floor level
+    available_treasures = get_available_items(vars.player['floor'], ['money'])
+    
+    if available_treasures:
+        # Higher chance for better treasures on higher floors
+        weighted_treasures = []
+        for treasure in available_treasures:
+            # Items of current floor's max rarity get more weight
+            if vars.player['floor'] <= 3 and treasure.get('rarity', 1) == 2:
+                weighted_treasures.extend([treasure] * 3)
+            elif vars.player['floor'] <= 6 and treasure.get('rarity', 1) == 3:
+                weighted_treasures.extend([treasure] * 3)
+            elif vars.player['floor'] <= 8 and treasure.get('rarity', 1) == 4:
+                weighted_treasures.extend([treasure] * 3)
+            elif vars.player['floor'] >= 9 and treasure.get('rarity', 1) == 5:
+                weighted_treasures.extend([treasure] * 3)
+            weighted_treasures.append(treasure)
+        
+        # Select a treasure and add some randomness to the amount
+        loot = random.choice(weighted_treasures)
+        base_amount = loot['amount']
+        amount = max(1, base_amount + random.randint(-5, 5))
+        
+        vars.player['gold'] += amount
+        vars.player['gold_collected'] += amount
+        console.print(vars.message["notification"]["found_loot"].format(loot=loot['name'], amount=amount))
+    else:
+        # Fallback if no appropriate treasures found
+        amount = random.randint(5, 10)
+        vars.player['gold'] += amount
+        vars.player['gold_collected'] += amount
+        console.print(vars.message["notification"]["found_loot"].format(loot="Gold", amount=amount))
+    
     time.sleep(vars.settings["delay_find_treasure"])
 
 def find_item(y, x):

@@ -19,9 +19,9 @@ def encounter_enemies(enemies):
     display_dungeon()
     
     if len(enemies) > 2:
-        enemy_names = ", ".join([enemy.type['name'] for enemy in enemies[:-1]]) + ", and " + enemies[-1].type['name']
+        enemy_names = ", a ".join([enemy.type['name'] for enemy in enemies[:-1]]) + ", and a " + enemies[-1].type['name']
     elif len(enemies) == 2:
-        enemy_names = " and ".join([enemy.type['name'] for enemy in enemies])
+        enemy_names = " and a ".join([enemy.type['name'] for enemy in enemies])
     else:
         enemy_names = enemies[0].type['name']
 
@@ -150,6 +150,9 @@ def encounter_enemies(enemies):
             if success:
                 console.print(vars.message["ui"]['bottom_lines']['titles']["escape"])
                 console.print(vars.message["battle"]["notifications"]["ran_away"])
+                # Add movement delay to all enemies involved in the battle
+                for enemy in enemies:
+                    enemy.delay_after_flee()
                 time.sleep(vars.settings["delay_flee_success"])
                 return
             else:

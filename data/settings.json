@@ -20,7 +20,7 @@
     "delay_find_item": 1.25,
     "delay_enemy_drop_loot": 1.0,
     "delay_need_to_identify": 0.75,
-    "delay_cannot_use": 0.75,
+    "delay_cannot_use": 1.25,
     "delay_shoot_projectile": 0.75,
     "delay_enter_shop": 2,
     "delay_not_enough_gold": 0.5,

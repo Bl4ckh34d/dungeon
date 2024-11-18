@@ -38,7 +38,18 @@ def show_menu():
         elif (vars.player['health'] < vars.player['max_health'] * (2/5) and vars.player['health'] > vars.player['max_health'] * (1/5)):
             health = vars.message['ui']['stats']['player']["health4"].format(health=vars.player['health'], max_health=vars.player['max_health'])
         else:
-            health = vars.message['ui']['stats']['player']["health1"].format(health=vars.player['health'], max_health=vars.player['max_health'])
+            health = vars.message['ui']['stats']['player']["health5"].format(health=vars.player['health'], max_health=vars.player['max_health'])
+
+        if (vars.player['mana'] > vars.player['max_mana'] * (4/5)):
+            mana = vars.message['ui']['stats']['player']["mana1"].format(mana=vars.player['mana'], max_mana=vars.player['max_mana'])
+        elif (vars.player['mana'] < vars.player['max_mana'] * (4/5) and vars.player['mana'] > vars.player['max_mana'] * (3/5)):
+            mana = vars.message['ui']['stats']['player']["mana2"].format(mana=vars.player['mana'], max_mana=vars.player['max_mana'])
+        elif (vars.player['mana'] < vars.player['max_mana'] * (3/5) and vars.player['mana'] > vars.player['max_mana'] * (2/5)):
+            mana = vars.message['ui']['stats']['player']["mana3"].format(mana=vars.player['mana'], max_mana=vars.player['max_mana'])
+        elif (vars.player['mana'] < vars.player['max_mana'] * (2/5) and vars.player['mana'] > vars.player['max_mana'] * (1/5)):
+            mana = vars.message['ui']['stats']['player']["mana4"].format(mana=vars.player['mana'], max_mana=vars.player['max_mana'])
+        else:
+            mana = vars.message['ui']['stats']['player']["mana5"].format(mana=vars.player['mana'], max_mana=vars.player['max_mana'])
         
         if vars.player['attack'] == vars.player['base_attack']:
             attack = vars.message['ui']['stats']['player']["attack1"].format(attack=vars.player['attack'], weapon_attack=weapon_attack)
@@ -106,21 +117,12 @@ def show_menu():
             level,
             health,
             mana,
-            strength,
-            defense,
-            speed,
-            intelligence,
-            wisdom,
-            awareness,
-            gold,
-            exp,
             "",
             attack,
             defense,
             agility,
             wisdom,
             awareness,
-            "",
             gold,
             exp,
             "",
@@ -456,7 +458,7 @@ def use_item_screen():
 
     # If there are no items, exit the function after displaying the message
     if not vars.player['inventory']:
-        console.print(vars.message["ui"]['bottom_lines']['instructions']["battle_options"])
+        console.print(vars.message["ui"]['bottom_lines']['instructions']["use_item_options"])
         time.sleep(vars.settings["delay_cannot_use"])
         return
 
@@ -490,6 +492,7 @@ def use_item_screen():
             if 'effect' in item:
                 apply_status_effect(vars.player, item['effect'])
                 vars.player['inventory'].pop(int(choice) - 1)
+            time.sleep(vars.settings["delay_use_item"])
             use_item_screen()
         elif item['type'] == 'weapon' and item.get('range', False):
             fire_ranged_weapon(item)

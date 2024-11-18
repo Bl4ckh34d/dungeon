@@ -62,9 +62,7 @@ def move_player(direction):
     if 0 <= new_y < vars.settings["dungeon_height"] and 0 <= new_x < vars.settings["dungeon_width"]:
         cell = vars.dungeon[new_y][new_x]
         adjacent_enemies = [enemy for enemy in vars.enemies if is_adjacent(enemy.pos, vars.player['pos'])]
-        if len(adjacent_enemies) > 0:
-            encounter_enemies(adjacent_enemies)
-        elif cell == vars.graphic["secret_door_char"]:
+        if cell == vars.graphic["secret_door_char"]:
             console.print(vars.message["notification"]["secret_door_found"])
             vars.dungeon[new_y][new_x] = vars.graphic["floor_char"]  # Replace door with normal floor
             reveal_secret_room([new_y, new_x])  # Reveal the connected room and hallway
@@ -97,6 +95,8 @@ def move_player(direction):
                 vars.player['pos'] = [new_y, new_x]
             else:
                 vars.player['pos'] = [new_y, new_x]
+        elif len(adjacent_enemies) > 0:
+            encounter_enemies(adjacent_enemies)
 
 def within_awareness(tile):
     """Check if a tile is within the player's awareness range."""

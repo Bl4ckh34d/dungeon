@@ -25,8 +25,18 @@ class Enemy:
         self.shooting_cooldown = enemy_type.get('shooting_cooldown', 1)
         self.turns_since_shot = 0
         self.id = str(uuid.uuid4())
+        self.flee_delay = 0  # New attribute to track flee delay
+
+    def delay_after_flee(self):
+        """Add a movement delay after player flees."""
+        self.flee_delay = 1  # Delay for 1 turn
 
     def move(self, player_pos):
+        # Handle flee delay
+        if self.flee_delay > 0:
+            self.flee_delay -= 1
+            return
+
         # Handle movement cooldown for slow enemies like Zombies
         if self.movement_cooldown > 1:
             self.turns_since_move += 1
@@ -180,34 +190,62 @@ def assign_enemy_weapon(enemy_type):
     if enemy_type['loot'] not in ['weapon', 'magical']:
         return None
 
+    # Random chance to not have a weapon (50% for most enemies)
+    weapon_chance = {
+        'm': 0.8,  # Mages have 80% chance to have a weapon (staff/wand)
+        's': 0.7,  # Skeletons have 70% chance to have a weapon
+        'b': 0.6,  # Goblins have 60% chance to have a weapon
+        'o': 0.6,  # Orcs have 60% chance to have a weapon
+        'k': 0.5,  # Kobolds have 50% chance
+    }.get(enemy_type['key'], 0)  # Default 0% chance for other enemies
+    
+    if random.random() > weapon_chance:
+        return None
+
     # Calculate enemy power level based on stats to determine appropriate weapon rarity
     power_level = (enemy_type['base_max_health'] + enemy_type['base_attack'] + enemy_type['base_defense']) / 20
-    min_rarity = max(1, min(round(power_level), 8))  # Scale from 1-8 to leave room for player to find better weapons
-    
-    # Get all weapons that match the enemy's combat style (ranged vs melee)
+    min_rarity = max(1, min(round(power_level), 8))
+
+    # Get all weapons that match the minimum rarity criteria
     possible_weapons = [item for item in vars.items if item['type'] == 'weapon' 
                        and item.get('rarity', 1) >= min_rarity 
                        and item.get('rarity', 1) <= min_rarity + 2]
     
     # Filter based on ranged vs melee preference
     if enemy_type.get('ranged', False):
-        possible_weapons = [w for w in possible_weapons if w.get('range', False) or not w.get('range', False) ]
+        # Ranged enemies can use both, but prefer ranged weapons (70% chance for ranged)
+        if random.random() < 0.7:
+            ranged_weapons = [w for w in possible_weapons if w.get('range', False)]
+            if ranged_weapons:  # If we found ranged weapons, use those
+                possible_weapons = ranged_weapons
     else:
+        # Melee enemies only use melee weapons
         possible_weapons = [w for w in possible_weapons if not w.get('range', False)]
     
     # Special handling for specific enemy types
-    if enemy_type['key'] == 'm':  # Mage prefers elemental weapons
-        elemental_weapons = [w for w in possible_weapons if w.get('effect') in ['burn', 'freeze', 'shock']]
+    if enemy_type['key'] == 'm':  # Mage prefers elemental weapons and staffs
+        elemental_weapons = [w for w in possible_weapons if w.get('effect') in ['burn', 'freeze', 'shock'] 
+                           or w.get('name', '').lower() in ['staff', 'wand']]
         if elemental_weapons:
             possible_weapons = elemental_weapons
-    elif enemy_type['key'] == 's':  # Skeleton prefers physical weapons
-        physical_weapons = [w for w in possible_weapons if not w.get('effect')]
-        if physical_weapons:
-            possible_weapons = physical_weapons
+    elif enemy_type['key'] == 's':  # Skeleton prefers bows and physical weapons
+        preferred_weapons = [w for w in possible_weapons if 'bow' in w.get('name', '').lower() 
+                           or (not w.get('effect') and not w.get('range', False))]
+        if preferred_weapons:
+            possible_weapons = preferred_weapons
+    elif enemy_type['key'] == 'b':  # Goblins prefer bows if ranged
+        if enemy_type.get('ranged', False):
+            bow_weapons = [w for w in possible_weapons if 'bow' in w.get('name', '').lower()]
+            if bow_weapons:
+                possible_weapons = bow_weapons
+    elif enemy_type['key'] == 'd':  # Dragons always use fire-based attacks
+        fire_weapons = [w for w in possible_weapons if w.get('effect') == 'burn']
+        if fire_weapons:
+            possible_weapons = fire_weapons
             
     # If we have possible weapons, choose one randomly
     if possible_weapons:
-        return random.choice(possible_weapons).copy()  # Return a copy to prevent modifying the original
+        return random.choice(possible_weapons).copy()
     
     # Fallback to basic weapons if no suitable weapons found
     basic_weapons = [item for item in vars.items if item['type'] == 'weapon' and item.get('rarity', 1) == 1]
