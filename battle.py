@@ -17,15 +17,35 @@ def encounter_enemies(enemies):
     from enemy import Enemy
     
     display_dungeon()
+    
     if len(enemies) > 2:
         enemy_names = ", ".join([enemy.type['name'] for enemy in enemies[:-1]]) + ", and " + enemies[-1].type['name']
     elif len(enemies) == 2:
         enemy_names = " and ".join([enemy.type['name'] for enemy in enemies])
     else:
         enemy_names = enemies[0].type['name']
-    console.print(format_status_bar(vars.player['health'], vars.player['max_health'], vars.player['mana'], vars.player['max_mana']))
+
+    console.print(vars.message["ui"]['bottom_lines']['titles']["battle"])
     time.sleep(vars.settings["delay_enemy_encounter"] / 2)
-    console.print(vars.message['battle']['battle_sit_rep'].format(enemy=enemy_names))
+    console.print(vars.message['battle']['notifications']['battle_sit_rep'].format(enemy=enemy_names))
+    time.sleep(vars.settings["delay_enemy_encounter"] / 2)
+
+    armedEnemies = [enemy for enemy in enemies if enemy.type['loot'] == 'weapon']
+    if len(armedEnemies) > 2:
+        enemy_names = ", ".join([enemy.type['name'] for enemy in armedEnemies[:-1]]) + ", and " + armedEnemies[-1].type['name']
+    elif len(armedEnemies) == 2:
+        enemy_names = " and ".join([enemy.type['name'] for enemy in armedEnemies])
+    elif len(armedEnemies) == 1:
+        enemy_names = armedEnemies[0].type['name']
+    else:
+        enemy_names = ""
+
+    if enemy_names != "" and armedEnemies:
+        if len(armedEnemies) > 1:
+            console.print(vars.message['battle']['notifications']['battle_sit_rep_multi_armed'].format(enemy=enemy_names))
+        else:
+            console.print(vars.message['battle']['notifications']['battle_sit_rep_single_armed'].format(enemy=enemy_names))
+    
     time.sleep(vars.settings["delay_enemy_encounter"])
     while enemies and vars.player['health'] > 0:
         for enemy in vars.enemies:
@@ -42,16 +62,16 @@ def encounter_enemies(enemies):
         display_dungeon()
         console.print(format_status_bar(vars.player['health'], vars.player['max_health'], vars.player['mana'], vars.player['max_mana']))
         handle_status_effects()
-        action = console.input(vars.message["notification"]["cursor"]).upper()
+        action = console.input(vars.message["input"]["cursor"]).upper()
         time.sleep(vars.settings["delay_player_action"] / 2)
         if action == 'A' or action == '':
             display_dungeon()
             console.print(format_status_bar(vars.player['health'], vars.player['max_health'], vars.player['mana'], vars.player['max_mana']))
             if len(enemies) > 1:
-                console.print(vars.message["battle"]["choose_enemy"])
+                console.print(vars.message["battle"]['notifications']["choose_enemy"])
                 for idx, enemy in enumerate(enemies):
                     console.print(f"{idx + 1}. {enemy.type['name']}")
-                choice = console.input(vars.message["notification"]["cursor"]).strip()
+                choice = console.input(vars.message["input"]["cursor"]).strip()
                 if not choice.isdigit() or not (1 <= int(choice) <= len(enemies)):
                     target_enemy = enemies[0]
                 else:
@@ -60,6 +80,7 @@ def encounter_enemies(enemies):
                 target_enemy = enemies[0]
             display_dungeon()
             console.print(format_status_bar(vars.player['health'], vars.player['max_health'], vars.player['mana'], vars.player['max_mana']))
+            
             weapon = vars.player['equipped']['weapon']
             weapon_attack = weapon['attack'] if weapon and 'attack' in weapon else 0
             damage_to_enemy = max(0, vars.player['attack'] + weapon_attack - target_enemy.defense + random.randint(-2, 2))
@@ -68,28 +89,30 @@ def encounter_enemies(enemies):
             damage_outcome = damage_to_enemy / max_possible_damage
             
             target_enemy.health -= damage_to_enemy
-            time.sleep(vars.settings["delay_battle_messages"])
-            if damage_to_enemy > 0 and target_enemy.type['key'] in ['g', 'c', 'r', 'g', 'k', 'f']:
-                if damage_outcome > 0.75:
-                    console.print(vars.message["battle"]["small_enemy_hit_hard_by_player"].format(damage=damage_to_enemy, type=target_enemy.type['name']))
-                else:
-                    console.print(vars.message["battle"]["small_enemy_hit_by_player"].format(damage=damage_to_enemy, type=target_enemy.type['name']))
-            elif damage_to_enemy > 0 and target_enemy.type['key'] in ['o', 't', 'd', 's', 'm', 'z', 'h']:
-                if damage_outcome > 0.75:
-                    console.print(vars.message["battle"]["medium_enemy_hit_hard_by_player"].format(damage=damage_to_enemy, type=target_enemy.type['name']))
-                else:
-                    console.print(vars.message["battle"]["medium_enemy_hit_by_player"].format(damage=damage_to_enemy, type=target_enemy.type['name']))
-            elif damage_to_enemy > 0 and target_enemy.type['key'] in ['t', 'd']:
-                if damage_outcome > 0.75:
-                    console.print(vars.message["battle"]["big_enemy_hit_hard_by_player"].format(damage=damage_to_enemy, type=target_enemy.type['name']))
-                else:
-                    console.print(vars.message["battle"]["big_enemy_hit_by_player"].format(damage=damage_to_enemy, type=target_enemy.type['name']))
-            elif target_enemy.type['key'] in ['g', 'c', 'r', 'g', 'k', 'f']:
-                console.print(vars.message["battle"]["enemy_missed_by_player"].format(type=target_enemy.type['name']))
-            elif target_enemy.type['key'] in ['o', 't', 'd', 's', 'm', 'z', 'h']:
-                console.print(vars.message["battle"]["enemy_blocked_player"].format(type=target_enemy.type['name']))
-            elif target_enemy.type['key'] in ['t', 'd']:
-                console.print(vars.message["battle"]["enemy_bounced_player"].format(type=target_enemy.type['name']))
+            #time.sleep(vars.settings["delay_battle_messages"])
+            if damage_to_enemy > 0:
+                if target_enemy.type['key'] in ['g', 'c', 'r', 'g', 'k', 'f']:
+                    if damage_outcome > 0.75:
+                        console.print(vars.message["battle"]["notifications"]["small_enemy_hit_hard_by_player"].format(damage=damage_to_enemy, type=target_enemy.type['name']))
+                    else:
+                        console.print(vars.message["battle"]["notifications"]["small_enemy_hit_by_player"].format(damage=damage_to_enemy, type=target_enemy.type['name']))
+                if target_enemy.type['key'] in ['o', 't', 'd', 's', 'm', 'z', 'h']:
+                    if damage_outcome > 0.75:
+                        console.print(vars.message["battle"]["notifications"]["medium_enemy_hit_hard_by_player"].format(damage=damage_to_enemy, type=target_enemy.type['name']))
+                    else:
+                        console.print(vars.message["battle"]["notifications"]["medium_enemy_hit_by_player"].format(damage=damage_to_enemy, type=target_enemy.type['name']))
+                if target_enemy.type['key'] in ['t', 'd']:
+                    if damage_outcome > 0.75:
+                        console.print(vars.message["battle"]["notifications"]["big_enemy_hit_hard_by_player"].format(damage=damage_to_enemy, type=target_enemy.type['name']))
+                    else:
+                        console.print(vars.message["battle"]["notifications"]["big_enemy_hit_by_player"].format(damage=damage_to_enemy, type=target_enemy.type['name']))
+            else:
+                if target_enemy.type['key'] in ['g', 'c', 'r', 'g', 'k', 'f']:
+                    console.print(vars.message["battle"]["notifications"]["enemy_dodged_player"].format(type=target_enemy.type['name']))
+                elif target_enemy.type['key'] in ['o', 't', 'd', 's', 'm', 'z', 'h']:
+                    console.print(vars.message["battle"]["notifications"]["enemy_blocked_player"].format(type=target_enemy.type['name']))
+                elif target_enemy.type['key'] in ['t', 'd']:
+                    console.print(vars.message["battle"]["notifications"]["enemy_bounced_player"].format(type=target_enemy.type['name']))
             time.sleep(vars.settings["delay_battle_messages"])
             if weapon and 'effect' in weapon and random.random() < 0.2 and damage_to_enemy > 0:
                 time.sleep(vars.settings["delay_battle_messages"])
@@ -97,9 +120,13 @@ def encounter_enemies(enemies):
                 time.sleep(vars.settings["delay_battle_messages"])
             if target_enemy.health <= 0:
                 time.sleep(vars.settings["delay_enemy_defeated"])
-                console.print(vars.message["battle"]["enemy_defeated"].format(type=target_enemy.type['name'], killed=random.choice(vars.message["killed"])))
+                console.print(vars.message["battle"]["notifications"]["enemy_defeated"].format(type=target_enemy.type['name'], killed=random.choice(vars.message['battle']['word_variety']['killed'])))
                 time.sleep(vars.settings["delay_enemy_defeated"])
+                rnd1 = random.randint(4, 7)
+                rnd2 = random.randint(4, 7)
+                vars.dungeon[target_enemy.pos[0]][target_enemy.pos[1]] = vars.graphic['bloody_floor_char'].format(color=f"[#{rnd1}{rnd2}0000]")
                 vars.player['exp'] += target_enemy.exp
+                vars.player['enemies_killed'] += 1
                 # Handle loot drops based on enemy type
                 handle_loot(target_enemy)
                 check_level_up()
@@ -121,13 +148,13 @@ def encounter_enemies(enemies):
             display_dungeon()
             success = attempt_run_away(enemy)
             if success:
-                console.print(vars.message["notification"]["escape_line"])
-                console.print(vars.message["battle"]["ran_away"])
+                console.print(vars.message["ui"]['bottom_lines']['titles']["escape"])
+                console.print(vars.message["battle"]["notifications"]["ran_away"])
                 time.sleep(vars.settings["delay_flee_success"])
                 return
             else:
                 console.print(format_status_bar(vars.player['health'], vars.player['max_health'], vars.player['mana'], vars.player['max_mana']))
-                console.print(vars.message["battle"]["flee_fail"])
+                console.print(vars.message["battle"]["notifications"]["flee_fail"])
                 time.sleep(vars.settings["delay_flee_success"])
                 # Enemies attack player
                 for enemy in enemies:
@@ -146,7 +173,7 @@ def encounter_enemies(enemies):
             time.sleep(vars.settings["delay_invalid_action"])
 
 def attempt_run_away(enemy):
-    run_chance = max(0.1, (vars.player['agility'] - enemy['base_agility']) / 10)
+    run_chance = max(0.1, (vars.player['agility'] - enemy.type['base_agility']) / 10)
     return random.random() < run_chance
 
 def enemy_attack(enemy):
@@ -154,9 +181,9 @@ def enemy_attack(enemy):
     vars.player['health'] -= damage_to_player
     time.sleep(vars.settings["delay_enemy_attack"])
     if damage_to_player > 0:
-        console.print(vars.message["battle"]["player_hit_by_enemy"].format(type=enemy.type['name'], damage=damage_to_player))
+        console.print(vars.message["battle"]["notifications"]["player_hit_by_enemy"].format(type=enemy.type['name'], damage=damage_to_player))
     else:
-        console.print(vars.message["battle"]["player_missed_by_enemy"].format(type=enemy.type['name']))
+        console.print(vars.message["battle"]["notifications"]["player_missed_by_enemy"].format(type=enemy.type['name']))
     time.sleep(vars.settings["delay_enemy_attack"])
     # Chance to apply poison effect
     if enemy.type['key'].lower() in ['r', 'b', 'k', 'g']:
@@ -168,7 +195,7 @@ def enemy_attack(enemy):
             blood_amount = int(enemy.type['base_attack'] / (vars.player['defense'] * random.random(0.5, 1.5)))
             vars.player['health'] - blood_amount
             enemy.type['health'] + blood_amount
-            console.print(vars.message["battle"]["life_steal"].format(enemy=enemy.type['name'], damage=blood_amount))
+            console.print(vars.message["battle"]["notifications"]["life_steal"].format(enemy=enemy.type['name'], damage=blood_amount))
     if enemy.type['key'].lower() in ['m', 'd']:
         if random.random() < 0.2 and damage_to_player > 0:
             apply_status_effect(vars.player, 'burn')
@@ -199,7 +226,7 @@ def apply_status_effect(target, effect):
         # Check if enemy is immune to the effect
         if 'immunities' in target.type and effect in target.type['immunities']:
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["battle"]["enemy_immune"].format(type=target.type['name'], effect=effect))
+            console.print(vars.message["battle"]["notifications"]["enemy_immune"].format(type=target.type['name'], effect=effect))
             time.sleep(vars.settings["delay_apply_status_effect"])
             return
         # Check if enemy has weakness to the effect
@@ -207,7 +234,7 @@ def apply_status_effect(target, effect):
             # Apply enhanced effect or additional damage
             duration_multiplier = 2
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["battle"]["enemy_weak"].format(type=target.type['name'], effect=effect))
+            console.print(vars.message["battle"]["notifications"]["enemy_weak"].format(type=target.type['name'], effect=effect))
             time.sleep(vars.settings["delay_apply_status_effect"])
         else:
             duration_multiplier = 1
@@ -225,7 +252,7 @@ def apply_status_effect(target, effect):
             duration = 5 * duration_multiplier
         target.status_effects.append({'effect': effect, 'duration': duration})
         time.sleep(vars.settings["delay_apply_status_effect"])
-        console.print(vars.message["battle"]["enemy_effect"].format(effect=effect, enemy=target.type['name']))
+        console.print(vars.message["battle"]["notifications"]["enemy_effect"].format(effect=effect, enemy=target.type['name']))
         time.sleep(vars.settings["delay_apply_status_effect"])
     else:
         # Check if the player already has the effect
@@ -235,107 +262,107 @@ def apply_status_effect(target, effect):
         if effect == 'poison':
             target['status_effects'].append(vars.effects["effect"][0])
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["poison"])
+            console.print(vars.message['battle']["status_effects"]["poison"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'burn':
             target['status_effects'].append(vars.effects["effect"][1])
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["fire"])
+            console.print(vars.message['battle']["status_effects"]["fire"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'freeze':
             target['status_effects'].append(vars.effects["effect"][2])
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["ice"])
+            console.print(vars.message['battle']["status_effects"]["ice"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'shock':
             target['status_effects'].append(vars.effects["effect"][3])
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["shock"])
+            console.print(vars.message['battle']["status_effects"]["shock"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'invisibility':
             target['status_effects'].append(vars.effects["effect"][4])
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["invisible"])
+            console.print(vars.message['battle']["status_effects"]["invisible"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'blindness':
             target['status_effects'].append(vars.effects["effect"][5])
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["blindness"])
+            console.print(vars.message['battle']["status_effects"]["blindness"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'silence':
             target['status_effects'].append(vars.effects["effect"][6])
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["silence"])
+            console.print(vars.message['battle']["status_effects"]["silence"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'poison_resist':
             target['status_effects'].append(vars.effects["effect"][7])
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["poison_resist"])
+            console.print(vars.message['battle']["status_effects"]["poison_resist"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'fire_resist':
             target['status_effects'].append(vars.effects["effect"][8])
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["fire_resist"])
+            console.print(vars.message['battle']["status_effects"]["fire_resist"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'ice_resist':
             target['status_effects'].append(vars.effects["effect"][9])
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["ice_resist"])
+            console.print(vars.message['battle']["status_effects"]["ice_resist"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'shock_resist':
             target['status_effects'].append(vars.effects["effect"][10])
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["shock_resist"])
+            console.print(vars.message['battle']["status_effects"]["shock_resist"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'blind_resist':
             target['status_effects'].append(vars.effects["effect"][11])
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["blind_resist"])
+            console.print(vars.message['battle']["status_effects"]["blind_resist"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'silence_resist':
             target['status_effects'].append(vars.effects["effect"][12])
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["silence_resist"])
+            console.print(vars.message['battle']["status_effects"]["silence_resist"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'heal':
             target['health'] = min(target['health'] + 10, target['max_health'])
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["heal"])
+            console.print(vars.message['battle']["status_effects"]["heal"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'charge':
             target['mana'] = min(target['mana'] + 10, target['max_mana'])
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["charge"])
+            console.print(vars.message['battle']["status_effects"]["charge"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'cure_poison':
             target['status_effects'] = [e for e in target['status_effects'] if e['effect'] != 'poison']
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["cure"])
+            console.print(vars.message['battle']["status_effects"]["cure"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'cure_burn':
             target['status_effects'] = [e for e in target['status_effects'] if e['effect'] != 'burn']
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["extinguished"])
+            console.print(vars.message['battle']["status_effects"]["extinguished"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'strength':
             target['attack'] += 2
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["strength_up"])
+            console.print(vars.message['battle']["status_effects"]["strength_up"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'defense':
             target['defense'] += 2
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["defense_up"])
+            console.print(vars.message['battle']["status_effects"]["defense_up"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'speed':
             target['agility'] += 2
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["speed_up"])
+            console.print(vars.message['battle']["status_effects"]["speed_up"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'wisdom':
             target['wisdom'] += 2
             time.sleep(vars.settings["delay_apply_status_effect"])
-            console.print(vars.message["status_effects"]["wisdom_up"])
+            console.print(vars.message['battle']["status_effects"]["wisdom_up"])
             time.sleep(vars.settings["delay_apply_status_effect"])
         elif effect == 'identify':
             time.sleep(vars.settings["delay_apply_status_effect"])
@@ -439,11 +466,10 @@ def handle_loot(enemy):
             time.sleep(vars.settings["delay_enemy_drop_loot"])
             console.print(f"The {enemy.type['name']} dropped a weapon and you pick it up!")
             time.sleep(vars.settings["delay_enemy_drop_loot"])
-            # Ensure the weapon is marked as identified when dropped by enemies
             enemy.weapon['identified'] = False
             enemy.weapon['name'] = f"Shrouded {enemy.weapon['type'].capitalize()}"
-
-            vars.player['inventory'].append(enemy.weapon)
+            vars.player['items_collected'] += 1
+            vars.player['inventory'].append(enemy.weapon.copy())
     elif enemy.loot_type == 'magical':
         magical_items = [item for item in vars.items if item['type'] in ['weapon', 'accessory'] and 'magic' in item.get('effect', '')]
         if magical_items:
@@ -451,6 +477,7 @@ def handle_loot(enemy):
             drop = drop.copy()
             drop['identified'] = False
             drop['name'] = f"Shrouded {drop['type'].capitalize()}"
+            vars.player['items_collected'] += 1
             vars.player['inventory'].append(drop)
             time.sleep(vars.settings["delay_enemy_drop_loot"])
             console.print(f"The {enemy.type['name']} dropped a mysterious {drop['type']} and you pick it up!")
@@ -461,6 +488,7 @@ def handle_loot(enemy):
             amount = loot['amount'] + random.randint(-10, 10)
             amount = max(5, amount)
             vars.player['gold'] += amount
+            vars.player['gold_collected'] += amount
             time.sleep(vars.settings["delay_enemy_drop_loot"])
             console.print(f"The {enemy.type['name']} dropped something valuable and you pick it up!")
             time.sleep(vars.settings["delay_enemy_drop_loot"])
@@ -469,6 +497,7 @@ def handle_loot(enemy):
             if loot['type'] in ['tool']:
                 loot['identified'] = False
                 loot['name'] = f"Shrouded {loot['type'].capitalize()}"
+            vars.player['items_collected'] += 1
             vars.player['inventory'].append(loot)
             time.sleep(vars.settings["delay_enemy_drop_loot"])
             console.print(f"The {enemy.type['name']} dropped something and you pick it up!")

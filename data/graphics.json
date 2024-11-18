@@ -1,11 +1,12 @@
 {
-    "wall_char": "[#333333]█[/#333333]",
-    "secret_wall_char": "[#222222]█[/#222222]",
-    "secret_floor_char": "[#222222]█[/#222222]",
-    "floor_char": "[#000000]░[/#000000]",
-    "secret_door_char": "[#222222]▓[/#222222]",
-    "exit_char": "[bold blue]^[/bold blue]",
-    "shop_char": "[magenta]S[/magenta]",
-    "treasure_char": "[gold1]*[/gold1]",
-    "item_char": "[cyan]°[/cyan]"
+    "wall_char": "[#333333]█[/]",
+    "secret_wall_char": "[#222222]█[/]",
+    "secret_floor_char": "[#222222]█[/]",
+    "floor_char": "[#000000]░[/]",
+    "bloody_floor_char": "{color}░[/]",
+    "secret_door_char": "[#222222]▓[/]",
+    "exit_char": "[bold blue]^[/]",
+    "shop_char": "[magenta]S[/]",
+    "treasure_char": "[gold1]*[/]",
+    "item_char": "[cyan]°[/]"
 }

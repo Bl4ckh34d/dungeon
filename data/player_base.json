@@ -30,5 +30,9 @@
     "base_defense": 5,
     "base_agility": 5,
     "base_wisdom": 5,
-    "base_awareness": 1
+    "base_awareness": 1,
+    "enemies_killed": 0,
+    "items_collected": 0,
+    "items_purchased": 0,
+    "gold_collected": 0
 }

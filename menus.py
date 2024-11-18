@@ -16,9 +16,9 @@ def show_menu():
     
     while True:
         clear_screen()
-        console.print(vars.message["notification"]["menu_line"])
+        console.print(vars.message["ui"]["top_lines"]["game_menu"])
         console.print()
-        console.print(vars.message["notification"]["player_stats"])
+        console.print(vars.message["ui"]['stats']['player']["title"])
         console.print()
         
         weapon = vars.player['equipped']['weapon']
@@ -26,28 +26,62 @@ def show_menu():
         accessory = vars.player['equipped']['accessory']
         weapon_attack = weapon['attack'] if weapon and 'attack' in weapon else 0
         armor_defense = armor['defense'] if armor and 'defense' in armor else 0
-        level = vars.message["notification"]["level"].format(level=vars.player['level'], remaining_exp=check_level_up())
+        
+        level = vars.message['ui']['stats']['player']['level'].format(level=vars.player['level'], remaining_exp=check_level_up())
+        
         if (vars.player['health'] > vars.player['max_health'] * (4/5)):
-            health = vars.message["notification"]["health1"].format(health=vars.player['health'], max_health=vars.player['max_health'])
+            health = vars.message['ui']['stats']['player']["health1"].format(health=vars.player['health'], max_health=vars.player['max_health'])
         elif (vars.player['health'] < vars.player['max_health'] * (4/5) and vars.player['health'] > vars.player['max_health'] * (3/5)):
-            health = vars.message["notification"]["health2"].format(health=vars.player['health'], max_health=vars.player['max_health'])
+            health = vars.message['ui']['stats']['player']["health2"].format(health=vars.player['health'], max_health=vars.player['max_health'])
         elif (vars.player['health'] < vars.player['max_health'] * (3/5) and vars.player['health'] > vars.player['max_health'] * (2/5)):
-            health = vars.message["notification"]["health3"].format(health=vars.player['health'], max_health=vars.player['max_health'])
+            health = vars.message['ui']['stats']['player']["health3"].format(health=vars.player['health'], max_health=vars.player['max_health'])
         elif (vars.player['health'] < vars.player['max_health'] * (2/5) and vars.player['health'] > vars.player['max_health'] * (1/5)):
-            health = vars.message["notification"]["health4"].format(health=vars.player['health'], max_health=vars.player['max_health'])
+            health = vars.message['ui']['stats']['player']["health4"].format(health=vars.player['health'], max_health=vars.player['max_health'])
         else:
-            health = vars.message["notification"]["health1"].format(health=vars.player['health'], max_health=vars.player['max_health'])
-        attack = vars.message["notification"]["attack1"].format(attack=vars.player['attack'], weapon_attack=weapon_attack)
-        defense = vars.message["notification"]["defense1"].format(defense=vars.player['defense'], armor_defense=armor_defense)
-        agility = vars.message["notification"]["agility1"].format(agility=vars.player['agility'])
-        wisdom = vars.message["notification"]["wisdom1"].format(wisdom=vars.player['wisdom'])
-        awareness = vars.message["notification"]["awareness1"].format(awareness=vars.player['awareness'])
-        gold = vars.message["notification"]["gold"].format(gold=vars.player['gold'])
-        exp = vars.message["notification"]["exp"].format(exp=vars.player['exp'])
-        equipped_weapon = vars.message["notification"]["equipped_weapon"].format(weapon=weapon["name"] if weapon else "")
-        equipped_armor = vars.message["notification"]["equipped_armor"].format(armor=armor["name"] if armor else "")
-        equipped_accessory = vars.message["notification"]["equipped_accessory"].format(accessory=accessory["name"] if accessory else "")
-        status_title = vars.message["notification"]["player_status"].format(
+            health = vars.message['ui']['stats']['player']["health1"].format(health=vars.player['health'], max_health=vars.player['max_health'])
+        
+        if vars.player['attack'] == vars.player['base_attack']:
+            attack = vars.message['ui']['stats']['player']["attack1"].format(attack=vars.player['attack'], weapon_attack=weapon_attack)
+        elif vars.player['attack'] > vars.player['base_attack']:
+            attack = vars.message['ui']['stats']['player']["attack2"].format(attack=vars.player['attack'], weapon_attack=weapon_attack)
+        else:
+            attack = vars.message['ui']['stats']['player']["attack3"].format(attack=vars.player['attack'], weapon_attack=weapon_attack)
+        
+        if vars.player['defense'] == vars.player['base_defense']:
+            defense = vars.message['ui']['stats']['player']["defense1"].format(defense=vars.player['defense'], armor_defense=armor_defense)
+        elif vars.player['defense'] > vars.player['base_defense']:
+            defense = vars.message['ui']['stats']['player']["defense2"].format(defense=vars.player['defense'], armor_defense=armor_defense)
+        else:
+            defense = vars.message['ui']['stats']['player']["defense3"].format(defense=vars.player['defense'], armor_defense=armor_defense)
+        
+        if vars.player['agility'] == vars.player['base_agility']:
+            agility = vars.message['ui']['stats']['player']["agility1"].format(agility=vars.player['agility'])
+        elif vars.player['agility'] > vars.player['base_agility']:
+            agility = vars.message['ui']['stats']['player']["agility2"].format(agility=vars.player['agility'])
+        else:
+            agility = vars.message['ui']['stats']['player']["agility3"].format(agility=vars.player['agility'])
+        
+        if vars.player['wisdom'] == vars.player['base_wisdom']:
+            wisdom = vars.message['ui']['stats']['player']["wisdom1"].format(wisdom=vars.player['wisdom'])
+        elif vars.player['wisdom'] > vars.player['base_wisdom']:
+            wisdom = vars.message['ui']['stats']['player']["wisdom2"].format(wisdom=vars.player['wisdom'])
+        else:
+            wisdom = vars.message['ui']['stats']['player']["wisdom3"].format(wisdom=vars.player['wisdom'])
+        
+        if vars.player['awareness'] == vars.player['base_awareness']:
+            awareness = vars.message['ui']['stats']['player']["awareness1"].format(awareness=vars.player['awareness'])
+        elif vars.player['awareness'] > vars.player['base_awareness']:
+            awareness = vars.message['ui']['stats']['player']["awareness2"].format(awareness=vars.player['awareness'])
+        else:
+            awareness = vars.message['ui']['stats']['player']["awareness3"].format(awareness=vars.player['awareness'])
+        
+        gold = vars.message['ui']['stats']['player']["gold"].format(gold=vars.player['gold'])
+        exp = vars.message['ui']['stats']['player']["exp"].format(exp=vars.player['exp'])
+        equipped_weapon = vars.message['ui']['stats']['player']["equipped_weapon"].format(weapon=weapon["name"] if weapon else "")
+        equipped_armor = vars.message['ui']['stats']['player']["equipped_armor"].format(armor=armor["name"] if armor else "")
+        equipped_accessory = vars.message['ui']['stats']['player']["equipped_accessory"].format(accessory=accessory["name"] if accessory else "")
+        
+        status_title = vars.message["ui"]["stats"]["player"]["status_effects"].format(
             status=", ".join(
                 f"  "+f"{effect['effect']} (Duration: {effect['duration']})"
                 for effect in vars.player['status_effects']
@@ -59,17 +93,27 @@ def show_menu():
             f"{effect['effect']} (Duration: {effect['duration']})"
             for effect in vars.player['status_effects'][:5]
         ]
+        
         status_fields += [""] * (5 - len(status_fields))
         
-        enemies_killed = vars.message["notification"]["enemies_killed"].format(count=0)
-        items_found = vars.message["notification"]["items_found"].format(count=0)
-        shops_visited = vars.message["notification"]["shops_visited"].format(count=0)
-        gold_found = vars.message["notification"]["gold_found"].format(count=0)
-        items_purchased = vars.message["notification"]["items_purchased"].format(count=0)
+        enemies_killed = vars.message['ui']['stats']['game']["enemies_killed"].format(count=vars.player['enemies_killed'])
+        items_collected = vars.message['ui']['stats']['game']["items_collected"].format(count=vars.player['items_collected'])
+        shops_visited = vars.message['ui']['stats']['game']["shops_visited"].format(count=len(vars.player['shops_visited']))
+        gold_collected = vars.message['ui']['stats']['game']["gold_collected"].format(count=vars.player['gold_collected'])
+        items_purchased = vars.message['ui']['stats']['game']["items_purchased"].format(count=vars.player['items_purchased'])
         
         element_array = [
             level,
             health,
+            mana,
+            strength,
+            defense,
+            speed,
+            intelligence,
+            wisdom,
+            awareness,
+            gold,
+            exp,
             "",
             attack,
             defense,
@@ -83,9 +127,9 @@ def show_menu():
             status_title,
             *status_fields,
             enemies_killed,
-            items_found,
+            items_collected,
             shops_visited,
-            gold_found,
+            gold_collected,
             items_purchased 
         ]
 
@@ -119,10 +163,10 @@ def show_menu():
         console.print(equipped_armor)
         console.print(equipped_accessory)
         console.print()
-        console.print(vars.message["notification"]["menu_control_line"])
+        console.print(vars.message["ui"]['bottom_lines']['instructions']["menu_options"])
 
         # Input handling code
-        choice = console.input(vars.message["notification"]["cursor"]).upper()
+        choice = console.input(vars.message["input"]["cursor"]).upper()
         if choice == 'S':
             save_game()
         elif choice == 'L':
@@ -138,9 +182,6 @@ def show_menu():
                 continue
         elif choice == '':
             break
-        else:
-            console.print(vars.message["warning"]["invalid_choice"])
-            time.sleep(vars.settings["delay_invalid_choice"])
 
 # Save game state to a JSON file
 def save_game():
@@ -148,7 +189,7 @@ def save_game():
     from utils import get_limited_input
     
     clear_screen()
-    console.print(vars.message["notification"]["save_title"])
+    console.print(vars.message["ui"]["top_lines"]["save_game"])
     console.print()
     console.print(vars.message['input']['save_name'])
     save_name = get_limited_input(f"{vars.message['notification']['cursor']}", 12).strip()
@@ -202,18 +243,18 @@ def load_game():
     from utils import clear_screen
     
     clear_screen()
-    console.print(vars.message["notification"]["load_game"])
+    console.print(vars.message["ui"]["top_lines"]["load_game"])
     console.print()
     
     # Define the directory where save files are located
     save_directory = './saves'
     save_files = [f for f in os.listdir(save_directory) if f.endswith('.json')]
     if not save_files:
-        console.print(vars.message["notification"]["no_save_file_found"])
+        console.print(vars.message["ui"]["middle_lines"]["no_save_file_found"])
         #time.sleep(vars.settings["delay_load_game"])
         #return
     else:
-        console.print(vars.message["notification"]["available_save_files"])
+        console.print(vars.message["ui"]["middle_lines"]["available_save_files"])
     console.print()
 
     # Create a table with three columns for the save files
@@ -240,10 +281,10 @@ def load_game():
 
     # Print the table and prompt for choice
     console.print(table)
-    console.print(vars.message["notification"]["load_game_options"])
+    console.print(vars.message["ui"]['bottom_lines']['instructions']["load_game_options"])
 
     # Get user input
-    choice = console.input(vars.message["notification"]["cursor"])
+    choice = console.input(vars.message["input"]["cursor"])
 
     if choice.isdigit():
         choice = int(choice)
@@ -270,12 +311,12 @@ def load_game():
                 vars.items_on_floor = {tuple(map(int, k.split(','))): v for k, v in game_state.get('items_on_floor', {}).items()}
                 
                 clear_screen()
-                console.print(vars.message["notification"]["load_game"])
+                console.print(vars.message["ui"]["top_lines"]["load_game"])
                 console.print()
-                console.print(vars.message["notification"]["available_save_files"])
+                console.print(vars.message["ui"]["middle_lines"]["available_save_files"])
                 console.print()
                 console.print(table)
-                console.print(vars.message["notification"]["load_game_options"])
+                console.print(vars.message["ui"]['bottom_lines']['instructions']["load_game_options"])
                 console.print(vars.message["notification"]["load_successful"].format(file=selected_file))
             except Exception as e:
                 console.print(vars.message["error"]["load_error"].format(error=e))
@@ -286,13 +327,10 @@ def load_game():
     elif choice == "":
         time.sleep(vars.settings["delay_load_game"])
         return
-    else:
-        console.print(vars.message["warning"]["invalid_choice"])
-        time.sleep(vars.settings["delay_invalid_choice"])
 
 def delete_save():
     clear_screen()
-    console.print(vars.message["notification"]["title_delete"])
+    console.print(vars.message["ui"]["top_lines"]["delete_save_file"])
     console.print()
     
     # List save files in the "./saves" directory
@@ -300,11 +338,11 @@ def delete_save():
     save_files = [f for f in os.listdir(save_directory) if f.endswith('.json')]
     
     if not save_files:
-        console.print(vars.message["notification"]["no_save_file"])
+        console.print(vars.message["ui"]["middle_lines"]["no_save_file"])
         #time.sleep(vars.settings["delay_delete_save"])
         #return
     else:
-        console.print(vars.message["notification"]["which_file_to_delete"])
+        console.print(vars.message["ui"]["middle_lines"]["which_file_to_delete"])
     console.print()
 
     # Create a table with three columns for the save files
@@ -330,9 +368,9 @@ def delete_save():
         table.add_row(col1, col2, col3)
     
     console.print(table)
-    console.print(vars.message["notification"]["which_to_delete"])
+    console.print(vars.message["ui"]['bottom_lines']['instructions']["delete_file_options"])
     
-    choice = console.input(vars.message["notification"]["cursor"])
+    choice = console.input(vars.message["input"]["cursor"])
     if choice.isdigit():
         choice = int(choice)
         if 1 <= choice <= len(save_files):
@@ -340,17 +378,17 @@ def delete_save():
             full_path = os.path.join(save_directory, selected_file)  # Full path to delete
             
             clear_screen()
-            console.print(vars.message["notification"]["title_delete"])
+            console.print(vars.message["ui"]['top_lines']["delete_save_file"])
             console.print()
-            console.print(vars.message["notification"]["which_file_to_delete"])
+            console.print(vars.message["ui"]["middle_lines"]["which_file_to_delete"])
             console.print()
             console.print(table)
-            console.print(vars.message["notification"]["which_to_delete"])
+            console.print(vars.message["ui"]['bottom_lines']['instructions']["delete_file_options"])
             confirm = console.input(vars.message["input"]["delete_file"].format(file=selected_file)).upper()
             if confirm == 'Y':
                 try:
                     os.remove(full_path)
-                    console.print(vars.message["notification"]["file_deleted"].format(file=selected_file))
+                    console.print(vars.message["ui"]["middle_lines"]["file_deleted"].format(file=selected_file))
                     load_game()
                 except Exception as e:
                     console.print(vars.message["error"]["delete_error"].format(error=e))
@@ -358,8 +396,6 @@ def delete_save():
                 console.print(vars.message["warning"]["deletion_canceled"])
         elif choice == len(save_files) + 1:
             console.print()
-        else:
-            console.print(vars.message["warning"]["invalid_choice"])
     elif choice == "":
         load_game()
     else:
@@ -374,7 +410,7 @@ def use_item_screen():
     from items import equip_item
     
     clear_screen()
-    console.print(vars.message["notification"]["inventory_line"])
+    console.print(vars.message["ui"]["top_lines"]["inventory"])
     console.print()
 
     # Create a table with three columns for the inventory display
@@ -420,22 +456,22 @@ def use_item_screen():
 
     # If there are no items, exit the function after displaying the message
     if not vars.player['inventory']:
-        console.print(vars.message["notification"]["player_action"])
+        console.print(vars.message["ui"]['bottom_lines']['instructions']["battle_options"])
         time.sleep(vars.settings["delay_cannot_use"])
         return
 
-    console.print(vars.message["notification"]["use_item"])
+    console.print(vars.message["ui"]['bottom_lines']['instructions']["use_item_options"])
     
     # User input for item selection
-    choice = console.input(vars.message["notification"]["cursor"]).upper()
+    choice = console.input(vars.message["input"]["cursor"]).upper()
     if choice == '':
         return
     elif choice.isdigit() and 1 <= int(choice) <= len(vars.player['inventory']):
         clear_screen()
-        console.print(vars.message["notification"]["inventory_line"])
+        console.print(vars.message["ui"]["top_lines"]["inventory"])
         console.print()
         console.print(table)
-        console.print(vars.message["notification"]["use_item"])
+        console.print(vars.message["ui"]['bottom_lines']['instructions']["use_item_options"])
         item = vars.player['inventory'][int(choice) - 1]
         
         if not item.get('identified', True):
@@ -446,13 +482,15 @@ def use_item_screen():
             if 'heal' in item:
                 vars.player['health'] = min(vars.player['max_health'], vars.player['health'] + item['heal'])
                 console.print(vars.message["notification"]["recovered_hp"].format(item=item['heal']))
+                vars.player['inventory'].pop(int(choice) - 1)
             if 'charge' in item:
                 vars.player['mana'] = min(vars.player['max_mana'], vars.player['mana'] + item['charge'])
                 console.print(vars.message["notification"]["recovered_mp"].format(item=item['charge']))
+                vars.player['inventory'].pop(int(choice) - 1)
             if 'effect' in item:
                 apply_status_effect(vars.player, item['effect'])
-                use_item_screen()
-            vars.player['inventory'].pop(int(choice) - 1)
+                vars.player['inventory'].pop(int(choice) - 1)
+            use_item_screen()
         elif item['type'] == 'weapon' and item.get('range', False):
             fire_ranged_weapon(item)
         elif item['type'] in ['weapon', 'armor', 'accessory']:
@@ -467,7 +505,7 @@ def use_item_screen():
 
 def show_item_details(item):
     clear_screen()
-    console.print(vars.message["notification"]["item_details"])
+    console.print(vars.message["ui"]["top_lines"]["item_details"])
     console.print()
 
     # Determine the initial content to be displayed based on the item type
@@ -531,13 +569,11 @@ def identify_item():
             console.print(f"You have identified the {item['name']}!")
         else:
             console.print("Item identification failed.")
-    else:
-        console.print(vars.message["warning"]["invalid_choice"])
         
 def sell_items():
     while True:
         clear_screen()
-        console.print(vars.message["notification"]["inventory_line"])
+        console.print(vars.message["ui"]["top_lines"]["inventory"])
         console.print()
         
         # Create a table with three columns for the inventory display
@@ -573,8 +609,8 @@ def sell_items():
             # Print the table and prompt for input
             console.print(table)
             console.print()
-            console.print(vars.message["notification"]["sell_item"])
-            choice = console.input(vars.message["notification"]["cursor"]).upper()
+            console.print(vars.message["ui"]['bottom_lines']['instructions']["sell_item_options"])
+            choice = console.input(vars.message["input"]["cursor"]).upper()
             
             if choice == '':
                 clear_screen()
@@ -583,12 +619,13 @@ def sell_items():
                 item = vars.player['inventory'].pop(int(choice)-1)
                 sell_price = item.get('value', 10) // 2
                 vars.player['gold'] += sell_price
+                vars.player['gold_collected'] += sell_price
                 clear_screen()
-                console.print(vars.message["notification"]["inventory_line"])
+                console.print(vars.message["ui"]["top_lines"]["inventory"])
                 console.print()
                 console.print(table)
                 console.print()
-                console.print(vars.message["notification"]["sell_item"])
+                console.print(vars.message["ui"]['bottom_lines']['instructions']["sell_item_options"])
                 console.print(vars.message["notification"]["sold_item"].format(item=item['name'], price=sell_price))
                 time.sleep(vars.settings["delay_sold"])
             else:
@@ -598,13 +635,13 @@ def sell_items():
             for _ in range(vars.settings["min_rows"]):
                 table.add_row("", "", "")
             clear_screen()
-            console.print(vars.message["notification"]["inventory_line"])
+            console.print(vars.message["ui"]["top_lines"]["inventory"])
             console.print()
-            console.print(vars.message["notification"]["nothing_to_sell"])
+            console.print(vars.message["ui"]['middle_lines']["nothing_to_sell"])
             console.print(table)
             console.print()
-            console.print(vars.message["notification"]["type_any_key"])
-            console.input(vars.message["notification"]["cursor"]).upper()
+            console.print(vars.message["ui"]['bottom_lines']['instructions']["return_options"])
+            console.input(vars.message["input"]["cursor"]).upper()
             break
         
 def identify_service(buffer):
@@ -643,8 +680,7 @@ def identify_service(buffer):
         console.print(buffer)
         identify_service(buffer)
     else:
-        console.print(vars.message["warning"]["invalid_choice"])
-        time.sleep(vars.settings["delay_invalid_choice"])
+        clear_screen()
         console.print(buffer)
         identify_service(buffer)
         
@@ -662,7 +698,7 @@ def enter_shop(shop_position):
         shop_items = vars.player['shops_items'].get(shop_id, [])
 
     # Construct static buffer with shop line and greeting
-    buffer = f"{vars.message['notification']['shop_line']}\n\n{greet_player(first_visit)}\n\n"
+    buffer = f"{vars.message['ui']['top_lines']['dungeon_shop']}\n\n{greet_player(first_visit)}\n\n"
 
     # Start the interaction loop
     while True:
@@ -697,10 +733,10 @@ def enter_shop(shop_position):
         console.print()
         console.print(f" You have [bold yellow]{vars.player['gold']} gold[/bold yellow].")
         console.print()
-        console.print(vars.message["notification"]["shop_control_line"])
+        console.print(vars.message["ui"]['bottom_lines']['instructions']["shop_options"])
 
         # Get player input for buying items or other options
-        choice = console.input(vars.message["notification"]["cursor"]).upper()
+        choice = console.input(vars.message["input"]["cursor"]).upper()
         if choice == '':  # Exit the shop
             break
         elif choice == 'S':
@@ -710,7 +746,7 @@ def enter_shop(shop_position):
             console.print()
             console.print(f" You have [bold yellow]{vars.player['gold']} gold[/bold yellow].")
             console.print()
-            console.print(vars.message["notification"]["==="])
+            console.print(vars.message["ui"]['bottom_lines']['instructions']["shop_options"])
             sell_items()
         elif choice == 'I':
             clear_screen()
@@ -719,8 +755,8 @@ def enter_shop(shop_position):
             console.print()
             console.print(f" You have [bold yellow]{vars.player['gold']} gold[/bold yellow].")
             console.print()
-            console.print(vars.message["notification"]["==="])
-            buffer2 = f"{buffer}\n{table}\n\n You have [bold yellow]{vars.player['gold']} gold[/bold yellow].\n\n{vars.message['notification']['===']}"
+            console.print(vars.message["ui"]['bottom_lines']['instructions']["shop_options"])
+            buffer2 = f"{buffer}\n{table}\n\n You have [bold yellow]{vars.player['gold']} gold[/bold yellow].\n\n{vars.message['ui']['bottom_lines']['instructions']['shop_options']}"
             identify_service(buffer2)
         elif choice.isdigit() and 1 <= int(choice) <= len(shop_items):
             # Buy item directly if a valid number is entered
@@ -733,6 +769,7 @@ def enter_shop(shop_position):
                 if item['type'] in ['weapon', 'armor', 'accessory']:
                     item['identified'] = True
                     item['name'] = f"{item['name'].capitalize()}"
+                vars.player['items_purchased'] += 1
                 vars.player['inventory'].append(item)
 
                 # Remove the bought item from shop_items and persist this update
@@ -743,9 +780,6 @@ def enter_shop(shop_position):
             else:
                 console.print("You don't have enough gold!")
             time.sleep(vars.settings["delay_not_enough_gold"])
-        else:
-            console.print(vars.message["warning"]["invalid_choice"])
-            time.sleep(vars.settings["delay_invalid_choice"])
             
 def greet_player(first_visit):
     player_class = determine_player_class()
@@ -775,7 +809,7 @@ def show_inventory():
     
     while True:
         clear_screen()
-        console.print(vars.message["notification"]["inventory_line"])
+        console.print(vars.message["ui"]["top_lines"]["inventory"])
         console.print()
         
         # Create a table with three columns for the inventory display
@@ -810,8 +844,8 @@ def show_inventory():
             # Print the table and prompt for input
             console.print(table)
             console.print()
-            console.print(vars.message["notification"]["use_item"])
-            choice = console.input(vars.message["notification"]["cursor"]).upper()
+            console.print(vars.message["ui"]['bottom_lines']['instructions']["use_item_options"])
+            choice = console.input(vars.message["input"]["cursor"]).upper()
             
             if choice == '':
                 break
@@ -820,8 +854,8 @@ def show_inventory():
                 if 0 <= idx < len(vars.player['inventory']):
                     item = vars.player['inventory'][idx]
                     show_item_details(item)
-                    console.print(vars.message["notification"]["show_inventory_control_line"])
-                    action = console.input(vars.message["notification"]["cursor"]).upper()
+                    console.print(vars.message["ui"]['bottom_lines']['instructions']["inventory_options"])
+                    action = console.input(vars.message["input"]["cursor"]).upper()
                     if action == 'E':
                         if item["type"] in ['armor', 'weapon', 'accessory']:
                             if not item.get('identified', True):
@@ -843,22 +877,15 @@ def show_inventory():
                     elif action == '':
                         continue
                     else:
-                        time.sleep(vars.settings["delay_invalid_choice"])
                         clear_screen()
-                else:
-                    console.print("Invalid choice. Please select a valid item index.")
-                    time.sleep(vars.settings["delay_invalid_choice"])
-            else:
-                console.print("Invalid choice. Please enter a number corresponding to an item.")
-                time.sleep(vars.settings["delay_invalid_choice"])
         else:
             # Add empty rows to meet the minimum row count if inventory is empty
             for _ in range(vars.settings["min_rows"]):
                 table.add_row("", "", "")
             
-            console.print(vars.message["notification"]["inventory_empty"])
+            console.print(vars.message["ui"]["middle_lines"]["inventory_empty"])
             console.print(table)
             console.print()
-            console.print(vars.message["notification"]["type_any_key"])
-            console.input(vars.message["notification"]["cursor"]).upper()
+            console.print(vars.message["ui"]['bottom_lines']['instructions']["return_options"])
+            console.input(vars.message["input"]["cursor"]).upper()
             break

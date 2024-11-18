@@ -4,6 +4,7 @@ import time
 import random
 import vars
 import sys
+import re
 
 def update_player_stats():
     """Update the player's stats based on equipped items."""
@@ -35,7 +36,7 @@ def check_level_up():
         vars.player['base_agility'] += 1
         vars.player['base_wisdom'] += 1
         vars.player['base_awareness'] += 1
-        console.print(vars.message['notification']['level_up'].format(level=vars.player['level']))
+        console.print(vars.message['battle']["notifications"]['level_up'].format(level=vars.player['level']))
         time.sleep(vars.settings["delay_leveled_up"])
         update_player_stats()
     else:
@@ -63,13 +64,17 @@ def move_player(direction):
         adjacent_enemies = [enemy for enemy in vars.enemies if is_adjacent(enemy.pos, vars.player['pos'])]
         if len(adjacent_enemies) > 0:
             encounter_enemies(adjacent_enemies)
-        elif cell == vars.graphic["wall_char"]:
-            console.print(vars.message["notification"]["wall_bump"])
         elif cell == vars.graphic["secret_door_char"]:
-            console.print(vars.message["notification"]["secret_door_bump"])
+            console.print(vars.message["notification"]["secret_door_found"])
             vars.dungeon[new_y][new_x] = vars.graphic["floor_char"]  # Replace door with normal floor
             reveal_secret_room([new_y, new_x])  # Reveal the connected room and hallway
-        elif cell in [vars.graphic["floor_char"], vars.graphic["item_char"], vars.graphic["treasure_char"], vars.graphic["exit_char"], vars.graphic["shop_char"]]:
+        elif re.sub(r"\[\#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})\]|\[/\]", "", cell) in [
+            re.sub(r"\[\#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})\]|\[/\]", "", vars.graphic['bloody_floor_char']),
+            re.sub(r"\[\#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})\]|\[/\]", "", vars.graphic["floor_char"]),
+            re.sub(r"\[\#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})\]|\[/\]", "", vars.graphic["item_char"]),
+            re.sub(r"\[\#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})\]|\[/\]", "", vars.graphic["treasure_char"]),
+            re.sub(r"\[\#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})\]|\[/\]", "", vars.graphic["exit_char"]),
+            re.sub(r"\[\#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})\]|\[/\]", "", vars.graphic["shop_char"])]:
             if (new_y, new_x) in vars.items_on_floor:
                 find_item(new_y, new_x)
                 del vars.items_on_floor[(new_y, new_x)]
@@ -79,7 +84,7 @@ def move_player(direction):
                 vars.dungeon[new_y][new_x] = vars.graphic["floor_char"]
             elif cell == vars.graphic["exit_char"]:
                 if vars.player['floor'] == 10:
-                    console.print(random.choice(vars.message["ending"]["game_finished"]))
+                    console.print(random.choice(vars.message["game_over"]["game_won"]))
                     vars.player['pos'] = [new_y, new_x]
                     sys.exit()
                 else:

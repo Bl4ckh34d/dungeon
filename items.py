@@ -7,23 +7,25 @@ import vars
 
 def find_treasure():
     display_dungeon()
-    console.print(vars.message["notification"]["controls_line"])
+    console.print(vars.message["ui"]['bottom_lines']['instructions']["play_options"])
     loot = random.choice([item for item in vars.items if item['type'] == 'money'])
     amount = loot['amount'] + random.randint(-5, 5)
     amount = max(1, amount)  # Ensure at least 1 gold
     vars.player['gold'] += amount
+    vars.player['gold_collected'] += amount
     console.print(vars.message["notification"]["found_loot"].format(loot=loot['name'], amount=amount))
     time.sleep(vars.settings["delay_find_treasure"])
 
 def find_item(y, x):
     display_dungeon()
-    console.print(vars.message["notification"]["controls_line"])
+    console.print(vars.message["ui"]['bottom_lines']['instructions']["play_options"])
     item = vars.items_on_floor.get((y, x))
     if item:
         item = item.copy()  # Create a copy to avoid modifying the original
         if item['type'] in ['weapon', 'armor', 'accessory']:
             item['identified'] = False
             item['name'] = f"Shrouded {item['type'].capitalize()}"
+        vars.player['items_collected'] += 1
         vars.player['inventory'].append(item)
         console.print(vars.message["notification"]["found_item"].format(item=item['name']))
     else:

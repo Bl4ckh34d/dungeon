@@ -23,7 +23,7 @@ def play_music(file):
 
 def game_over():
     console.print()
-    console.print(vars.message["game_over"]["defeated"])
+    console.print(vars.message["game_over"]["game_over"])
     choice = console.input(vars.message["input"]["restart_or_quit"]).upper()
     if choice == "R":
         reset_game()
@@ -35,26 +35,17 @@ def game_over():
         sys.exit()
     else:
         console.print()
-        console.print(vars.message["game_over"]["invalid_choice"])
+        console.print(vars.message["game_over"]["thank_you"])
         stop_music()
         sys.exit()
 
 def reset_game():
-    vars.player['health'] = vars.player['max_health']
-    vars.player['gold'] = random.randint(0,50)
-    vars.player['floor'] = 1
-    vars.player['level'] = 1
-    vars.player['exp'] = 0
-    vars.player['attack'] = 10
-    vars.player['defense'] = 5
-    vars.player['agility'] = 5
-    vars.player['awareness'] = 1
-    vars.player['inventory'] = []
-    vars.player['equipped'] = {'weapon': None, 'armor': None, 'accessory': None}
-    vars.player['status_effects'] = []
-    vars.player['symbol'] = '[green]@[/green]'
-    vars.player['class'] = 'Warrior'
-    vars.player['shops_visited'] = set()
+    try:
+        with open("data/player_base.json", encoding="utf-8") as f:
+            vars.player = json.load(f)
+    except FileNotFoundError:
+        console.print("Error: player_base.json not found.")
+        sys.exit()
 
 # Main game loop
 def main_game_loop():
@@ -76,8 +67,8 @@ def main_game_loop():
     generate_dungeon(vars.player)
     while vars.player['health'] > 0:
         display_dungeon()
-        console.print(vars.message["notification"]["controls_line"])
-        move = console.input(vars.message["notification"]["cursor"]).upper()
+        console.print(vars.message["ui"]['bottom_lines']['instructions']["play_options"])
+        move = console.input(vars.message["input"]["cursor"]).upper()
         if move == "W":
             move_player("N")
         elif move == "S":
@@ -122,7 +113,7 @@ def main_game_loop():
                     else:
                         damage = max(0, 5 - vars.player['defense'] + random.randint(-2, 2))  # Default damage
                     vars.player['health'] -= damage
-                    console.print(vars.message["battle"]["player_hit_by_projectile"].format(damage=damage))
+                    console.print(vars.message["battle"]["notifications"]["player_hit_by_projectile"].format(damage=damage))
                     vars.projectiles.remove(p)
                     if vars.player['health'] <= 0:
                         game_over()
@@ -134,14 +125,18 @@ def main_game_loop():
                     weapon_attack = weapon.get('attack', 0)
                     damage = max(0, vars.player['attack'] + weapon_attack - enemy_hit.defense + random.randint(-2, 2))
                     enemy_hit.health -= damage
-                    console.print(vars.message["battle"]["enemy_hit_by_projectile"].format(enemy=enemy_hit.type['name'], damage=damage))
+                    console.print(vars.message["battle"]["notifications"]["enemy_hit_by_projectile"].format(enemy=enemy_hit.type['name'], damage=damage))
                     if weapon and 'effect' in weapon and damage > 0:
                         apply_status_effect(enemy_hit, weapon['effect'])
                     vars.projectiles.remove(p)
                     if enemy_hit.health <= 0:
                         time.sleep(vars.settings["delay_defeated_enemy"] / 2)
-                        console.print(vars.message["battle"]["enemy_defeated"].format(enemy=enemy_hit.type['name']))
+                        console.print(vars.message["battle"]["notifications"]["enemy_defeated"].format(type=enemy_hit.type['name'], killed=random.choice(vars.message['battle']['word_variety']['killed'])))
+                        rnd1 = random.randint(4, 7)
+                        rnd2 = random.randint(4, 7)
+                        vars.dungeon[enemy_hit.pos[0]][enemy_hit.pos[1]] = vars.graphic['bloody_floor_char'].format(color=f"[#{rnd1}{rnd2}0000]")
                         vars.player['exp'] += enemy_hit.exp
+                        vars.player['enemies_killed'] += 1
                         handle_loot(enemy_hit)
                         check_level_up()
                         time.sleep(vars.settings["delay_defeated_enemy"] / 2)

@@ -176,17 +176,39 @@ class Enemy:
         return enemy
 
 def assign_enemy_weapon(enemy_type):
-    # Assign weapons based on enemy type and variations
-    if enemy_type['loot'] in ['weapon', 'magical']:
-        possible_weapons = [item for item in vars.items if item['type'] == 'weapon']
-        # Further filter weapons based on whether enemy is ranged
-        if enemy_type['ranged']:
-            possible_weapons = [w for w in possible_weapons if w.get('range', False)]
-        else:
-            possible_weapons = [w for w in possible_weapons if not w.get('range', False)]
-        if possible_weapons:
-            weapon = random.choice(possible_weapons)
-            weapon = weapon.copy()
-            weapon['identified'] = True  # Enemies know their weapons
-            return weapon
-    return None
+    # Only assign weapons to enemies that can have weapons
+    if enemy_type['loot'] not in ['weapon', 'magical']:
+        return None
+
+    # Calculate enemy power level based on stats to determine appropriate weapon rarity
+    power_level = (enemy_type['base_max_health'] + enemy_type['base_attack'] + enemy_type['base_defense']) / 20
+    min_rarity = max(1, min(round(power_level), 8))  # Scale from 1-8 to leave room for player to find better weapons
+    
+    # Get all weapons that match the enemy's combat style (ranged vs melee)
+    possible_weapons = [item for item in vars.items if item['type'] == 'weapon' 
+                       and item.get('rarity', 1) >= min_rarity 
+                       and item.get('rarity', 1) <= min_rarity + 2]
+    
+    # Filter based on ranged vs melee preference
+    if enemy_type.get('ranged', False):
+        possible_weapons = [w for w in possible_weapons if w.get('range', False) or not w.get('range', False) ]
+    else:
+        possible_weapons = [w for w in possible_weapons if not w.get('range', False)]
+    
+    # Special handling for specific enemy types
+    if enemy_type['key'] == 'm':  # Mage prefers elemental weapons
+        elemental_weapons = [w for w in possible_weapons if w.get('effect') in ['burn', 'freeze', 'shock']]
+        if elemental_weapons:
+            possible_weapons = elemental_weapons
+    elif enemy_type['key'] == 's':  # Skeleton prefers physical weapons
+        physical_weapons = [w for w in possible_weapons if not w.get('effect')]
+        if physical_weapons:
+            possible_weapons = physical_weapons
+            
+    # If we have possible weapons, choose one randomly
+    if possible_weapons:
+        return random.choice(possible_weapons).copy()  # Return a copy to prevent modifying the original
+    
+    # Fallback to basic weapons if no suitable weapons found
+    basic_weapons = [item for item in vars.items if item['type'] == 'weapon' and item.get('rarity', 1) == 1]
+    return random.choice(basic_weapons).copy() if basic_weapons else None

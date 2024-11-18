@@ -6,7 +6,7 @@ import re
 
 def display_dungeon():
     clear_screen()
-    vars.console.print(vars.message["notification"]["map_line"])
+    vars.console.print(vars.message["ui"]["top_lines"]["map"])
     for y in range(vars.settings["dungeon_height"]):
         row = ""
         for x in range(vars.settings["dungeon_width"]):
@@ -124,7 +124,7 @@ def format_visualization_line(variable, total_length=70):
 
 def format_status_bar(player_health, player_max_health, player_mana, player_max_mana, total_length=70):
     # Define the encounter message
-    base_text = vars.message['notification']['player_action']
+    base_text = vars.message['ui']['bottom_lines']['instructions']['battle_options']
     # Remove any markup or tags for text length calculation
     filtered_text = re.sub(r'\[/?[a-zA-Z\s]+\]', '', base_text)
     text_length = len(filtered_text)

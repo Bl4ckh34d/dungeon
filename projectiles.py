@@ -20,8 +20,6 @@ def fire_ranged_weapon(weapon):
         target_enemy = targets[int(choice)-1]
         # Fire projectile towards the enemy
         create_player_projectile(target_enemy.pos, weapon, target_enemy)
-    else:
-        console.print(vars.message["warning"]["invalid_choice"])
 
 def get_targets_in_line_of_sight():
     
@@ -63,5 +61,5 @@ def create_player_projectile(target_pos, weapon, target):
         'weapon': weapon
     }
     vars.projectiles.append(projectile)
-    console.print(vars.message["battle"]["shoot_projectile"].format(type=target.type['name']))
+    console.print(vars.message["battle"]["notifications"]["shoot_projectile"].format(type=target.type['name']))
     time.sleep(vars.settings["delay_shoot_projectile"])
