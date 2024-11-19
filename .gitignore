@@ -23,3 +23,7 @@ ENV/
 
 # Game-specific
 saves/
+saves/*.json
+*.sav
+save_*.json
+Shop.json
