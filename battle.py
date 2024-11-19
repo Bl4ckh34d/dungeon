@@ -106,6 +106,7 @@ def encounter_enemies(enemies):
                         console.print(vars.message["battle"]["notifications"]["big_enemy_hit_hard_by_player"].format(damage=damage_to_enemy, type=target_enemy.type['name']))
                     else:
                         console.print(vars.message["battle"]["notifications"]["big_enemy_hit_by_player"].format(damage=damage_to_enemy, type=target_enemy.type['name']))
+                time.sleep(vars.settings["delay_battle_messages"])
             else:
                 if target_enemy.type['key'] in ['g', 'c', 'r', 'g', 'k', 'f']:
                     console.print(vars.message["battle"]["notifications"]["enemy_dodged_player"].format(type=target_enemy.type['name']))
@@ -113,7 +114,7 @@ def encounter_enemies(enemies):
                     console.print(vars.message["battle"]["notifications"]["enemy_blocked_player"].format(type=target_enemy.type['name']))
                 elif target_enemy.type['key'] in ['t', 'd']:
                     console.print(vars.message["battle"]["notifications"]["enemy_bounced_player"].format(type=target_enemy.type['name']))
-            time.sleep(vars.settings["delay_battle_messages"])
+                time.sleep(vars.settings["delay_battle_messages"])
             if weapon and 'effect' in weapon and random.random() < 0.2 and damage_to_enemy > 0:
                 time.sleep(vars.settings["delay_battle_messages"])
                 apply_status_effect(target_enemy, weapon['effect'])

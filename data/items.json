@@ -442,7 +442,7 @@
     },
     {
         "id": "s5",
-        "name": "Scroll of Cure Poison",
+        "name": "Scroll of Detox",
         "type": "scroll",
         "effect": "cure_poison",
         "value": 50,
