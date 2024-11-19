@@ -4,7 +4,7 @@
     "padding": 1,
     "min_room_size": 6,
     "secret_room_chance": 0.2,
-    "debug": true,
+    "debug": false,
     "min_rows": 17,
     "delay_next_floor": 0.75,
     "delay_flee_success": 0.5,
@@ -33,5 +33,6 @@
     "delay_save_game": 0.75,
     "delay_load_game": 0.75,
     "delay_delete_save": 0.75,
-    "delay_input_truncated": 0.75
+    "delay_input_truncated": 0.75,
+    "delay_movement_tick": 0.15
 }
